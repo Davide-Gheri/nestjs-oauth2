@@ -1,0 +1,12 @@
+<div>
+    <code>
+        <pre>{{jsonPretty user}}</pre>
+    </code>
+</div>
+
+{{#if user }}
+    <form action="/auth/logout" method="post">
+        <input type="hidden" name="_csrf" value="{{csrf}}">
+        <button type="submit">Logout</button>
+    </form>
+{{/if}}
