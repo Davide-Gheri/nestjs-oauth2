@@ -33,9 +33,6 @@ export class OAuthClient extends BaseEntity {
   scopes: string[];
 
   @Column({ type: 'boolean', default: false })
-  public: boolean;
-
-  @Column({ type: 'boolean', default: false })
   firstParty: boolean;
 
   @Column({ type: 'varchar', array: true, default: `{${TokenAuthMethod.CLIENT_SECRET_BASIC},${TokenAuthMethod.CLIENT_SECRET_POST}}` })
