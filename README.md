@@ -8,7 +8,6 @@ WIP
 
 ### TODO
 
-* Revoke endpoint
 * Non JWT Access token 
 * Documentation
 * Comments

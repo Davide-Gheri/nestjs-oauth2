@@ -5,7 +5,7 @@ import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { GrantInterface, GrantScanner } from '../modules/common';
 import { ModuleRef } from '@nestjs/core';
 import { InjectRepository } from '@nestjs/typeorm';
-import { OAuthAccessToken } from '@app/entities';
+import { OAuthAccessToken, OAuthRefreshToken } from '@app/entities';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -29,6 +29,8 @@ export abstract class OAuthService implements OnModuleInit {
   constructor(
     @InjectRepository(OAuthAccessToken)
     protected readonly accessTokenRepository: Repository<OAuthAccessToken>,
+    @InjectRepository(OAuthRefreshToken)
+    protected readonly refreshTokenRepository: Repository<OAuthRefreshToken>,
   ) {}
 
   onModuleInit(): any {

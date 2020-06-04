@@ -5,9 +5,10 @@ import { User } from './user';
 import { toEpochSeconds } from '../utils';
 import { AccessTokenJwtPayload } from '@app/modules/oauth2/interfaces';
 import { GrantTypes } from '@app/modules/oauth2/constants';
+import { BaseToken } from '@app/entities/base.token';
 
 @Entity()
-export class OAuthAccessToken extends BaseEntity {
+export class OAuthAccessToken extends BaseToken {
   @Column({ type: 'uuid', nullable: true })
   userId: string;
 
@@ -16,12 +17,6 @@ export class OAuthAccessToken extends BaseEntity {
 
   @Column({ type: 'varchar', array: true, nullable: true })
   scopes: string[];
-
-  @Column({ type: 'timestamp without time zone' })
-  expiresAt: Date;
-
-  @Column({ type: 'boolean' })
-  revoked: false;
 
   @Column({ type: 'varchar', enum: GrantTypes })
   grantType: GrantTypes;

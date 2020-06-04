@@ -52,3 +52,8 @@ export enum TokenAuthMethod {
   CLIENT_SECRET_BASIC = 'client_secret_basic',
   NONE = 'none',
 }
+
+export enum TokenType {
+  ACCESS_TOKEN = 'access_token',
+  REFRESH_TOKEN = 'refresh_token',
+}

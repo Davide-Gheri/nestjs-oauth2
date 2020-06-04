@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, HttpCode, Post, Req, UseGuards } from '@nestjs/common';
 import { IntrospectDto, TokenDto } from '../dto';
 import { TokenService } from '../services';
 import { Request } from 'express';
@@ -34,6 +34,19 @@ export class TokenController {
   tokenInfo(
     @Body() data: IntrospectDto,
   ) {
-    return this.service.verifyToken(data.token);
+    return this.service.verifyToken(data.token, data.token_type_hint);
+  }
+
+  @UseGuards(ClientAuthGuard())
+  @HttpCode(200)
+  @Post('revoke')
+  async revokeToken(
+    @Body() data: IntrospectDto,
+  ) {
+    const { token } = await this.service.decryptToken(data.token, data.token_type_hint);
+    if (token) {
+      await this.service.revokeToken(token);
+    }
+    throw new BadRequestException('invalid token');
   }
 }

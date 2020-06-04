@@ -9,7 +9,7 @@ import {
   AuthorizationCodeModule,
 } from './modules';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { OAuthAccessToken, OAuthClient } from '@app/entities';
+import { OAuthAccessToken, OAuthClient, OAuthRefreshToken } from '@app/entities';
 import { APP_FILTER } from '@nestjs/core';
 import { OAuthExceptionFilter } from './filters';
 import { DebugController } from '@app/modules/oauth2/controllers/debug.controller';
@@ -22,7 +22,9 @@ import { DebugController } from '@app/modules/oauth2/controllers/debug.controlle
     RefreshTokenModule,
     AuthorizationCodeModule,
     TypeOrmModule.forFeature([
-      OAuthAccessToken, OAuthClient,
+      OAuthAccessToken,
+      OAuthRefreshToken,
+      OAuthClient,
     ]),
   ],
   providers: [

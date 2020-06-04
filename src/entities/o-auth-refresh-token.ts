@@ -3,17 +3,12 @@ import { BaseEntity } from './base.entity';
 import { RefreshTokenData } from '@app/modules/oauth2/interfaces';
 import { toEpochSeconds } from '../utils';
 import { OAuthAccessToken } from './o-auth-access-token';
+import { BaseToken } from '@app/entities/base.token';
 
 @Entity()
-export class OAuthRefreshToken extends BaseEntity {
+export class OAuthRefreshToken extends BaseToken {
   @Column({ type: 'uuid' })
   accessTokenId: string;
-
-  @Column({ type: 'boolean' })
-  revoked: boolean;
-
-  @Column({ type: 'timestamp without time zone' })
-  expiresAt: Date;
 
   @ManyToOne(type => OAuthAccessToken, {
     eager: true,
