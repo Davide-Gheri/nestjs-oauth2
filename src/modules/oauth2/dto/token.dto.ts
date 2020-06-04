@@ -4,7 +4,7 @@ import { GrantTypes } from '../constants';
 export class TokenDto {
   @IsNotEmpty()
   @IsString()
-  @IsEnum(GrantTypes)
+  @IsEnum(GrantTypes, { message: `grant_type must be one of: ${Object.values(GrantTypes)}` })
   grant_type: GrantTypes;
 
   @ValidateIf((o: TokenDto) => o.grant_type === GrantTypes.PASSWORD)

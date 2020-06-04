@@ -1,5 +1,5 @@
 import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { TokenType } from '@app/modules/oauth2/constants';
+import { ResponseModes, TokenType } from '@app/modules/oauth2/constants';
 
 export class IntrospectDto {
   @IsNotEmpty()
@@ -15,7 +15,7 @@ export class IntrospectDto {
   client_secret?: string;
 
   @IsOptional()
-  @IsEnum(TokenType)
+  @IsEnum(TokenType, { message: `token_type_hint must be one of: ${Object.values(TokenType)}` })
   token_type_hint?: TokenType;
 }
 

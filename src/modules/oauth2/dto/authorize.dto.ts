@@ -25,11 +25,11 @@ export class AuthorizeDto {
   code_challenge_method: string;
 
   @IsOptional()
-  @IsEnum(ResponseModes)
+  @IsEnum(ResponseModes, { message: `response_mode must be one of: ${Object.values(ResponseModes)}` })
   response_mode: ResponseModes = ResponseModes.QUERY;
 
   @IsNotEmpty()
-  @IsEnum(ResponseTypes)
+  @IsEnum(ResponseTypes, { message: `response_type must be one of: ${Object.values(ResponseTypes)}` })
   response_type: ResponseTypes;
 
   @IsNotEmpty()
@@ -37,7 +37,7 @@ export class AuthorizeDto {
   redirect_uri: string;
 
   @IsOptional()
-  @IsEnum(PromptTypes)
+  @IsEnum(PromptTypes, { message: `prompt must be one of: ${Object.values(PromptTypes)}` })
   prompt: PromptTypes = PromptTypes.CONSENT;
 
   get scopes() {

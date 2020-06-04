@@ -5,5 +5,5 @@ export const oauth = registerAs('oauth', () => ({
   accessTokenTTL: 36000,
   refreshTokenTTL: 3600000,
 
-  accessTokenType: 'jwt',
+  accessTokenType: 'aes',
 }));

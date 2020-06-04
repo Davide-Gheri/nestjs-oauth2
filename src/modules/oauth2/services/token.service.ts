@@ -8,31 +8,50 @@ import { OAuthAccessToken, OAuthRefreshToken } from '@app/entities';
 import { grantsWithIdToken, Scopes, TokenType } from '../constants';
 import { OAuthService } from './oauth.service';
 
+/**
+ * Handles all Token related operations
+ */
 @Injectable()
 export class TokenService extends OAuthService {
+  /**
+   * An access_token is requested, use the correct grant to issue it
+   * return the access_token and, if requested, a refresh_token and an id_token
+   * @param req
+   * @param body
+   */
   public async respondToAccessTokenRequest(req: Request, body: TokenDto) {
     const grant = this.grants.find(g => g.getIdentifier() === body.grant_type);
     if (!grant) {
       this.logger.warn(`Unknown grant ${body.grant_type}`);
       throw OAuthException.unsupportedGrantType();
     }
+    /**
+     * Use the requested grant to issue the token(s)
+     */
     const { accessToken, user, refreshToken } = await grant.respondToAccessTokenRequest(req, body);
 
     const response: AccessTokenResponse = {
       type: 'Bearer',
+      // Convert milliseconds to seconds
       expires_in: toEpochSeconds(accessToken.expiresAt.getTime() - Date.now()),
-      access_token: await this.stringifyToken(accessToken),
+      // Use the configured access_token strategy to stringify it
+      access_token: await this.tokenStrategy.sign(accessToken.toPayload()),
     };
 
+    // issuing or not a refresh_token is delegated to the grant
+    // if a refreshToken is found here, we need to issue it
     if (refreshToken) {
       response.refresh_token = this.cipherService.encrypt(refreshToken.toPayload());
     }
 
+    // issuing or not an id_token is based on the requested scope and if the at is bound to an user
     if (this.shouldIssueIdToken(body) && user) {
+      // Id tokens are always JWT
       response.id_token = await this.jwtService.sign({
         aud: accessToken.clientId,
         exp: toEpochSeconds(accessToken.expiresAt),
         sub: user.id,
+        iss: this.config.get('app.appUrl'),
         ...accessToken.scopes.includes('email') && { email: user.email },
         ...accessToken.scopes.includes('profile') && user.toOpenIdProfile(body.scopes as Scopes[]),
       }, 'id_token');
@@ -41,26 +60,31 @@ export class TokenService extends OAuthService {
     return response;
   }
 
+  /**
+   * Check if the response should include an id_token
+   * @param body
+   */
   protected shouldIssueIdToken(body: TokenDto): boolean {
     return body.scopes.includes('openid') && grantsWithIdToken.includes(body.grant_type);
   }
 
-  protected stringifyToken(token: OAuthAccessToken) {
-    switch (this.config.get('oauth.accessTokenType') || 'jwt') {
-      case 'jwt':
-        return this.jwtService.sign(token.toPayload(), 'access_token');
-      case 'code':
-        return this.cipherService.encrypt(token.toPayload());
-    }
-  }
-
+  /**
+   * Decrypt the passed token using the configured access_token strategy or the cipher directly if is a refresh_token
+   * @param encrypted
+   * @param hint
+   */
   public async decryptToken(encrypted: string, hint?: TokenType) {
-    // Try to decrypt as JWT
-    let decoded: AccessTokenJwtPayload | RefreshTokenData = await this.decryptJwt(encrypted);
-    if (!decoded) {
-      // Not a JWT, try to decrypt as AES-CBC
+    let decoded: AccessTokenJwtPayload | RefreshTokenData;
+    try {
+      decoded = await this.tokenStrategy.verify(encrypted);
+    } catch (e) {
+      // It could be a Refresh Token, try to decrypt it
       decoded = this.decryptCipher(encrypted);
+      if (decoded) { // Found, force as refresh_token
+        hint = TokenType.REFRESH_TOKEN;
+      }
     }
+
     // Invalid token
     if (!decoded) {
       return { accessToken: null, decoded: null, refreshToken: null };
@@ -68,29 +92,39 @@ export class TokenService extends OAuthService {
 
     let token: OAuthAccessToken | OAuthRefreshToken;
 
-    // If a token hint is passed use it to choose which repository to use to retrieve the token from the DB
+    // If a token hint is passed, use it to choose which repository to use to retrieve the token from the DB
     if (hint) {
       switch (hint) {
         case TokenType.ACCESS_TOKEN:
           if ('jti' in decoded) {
-            token = await this.accessTokenRepository.findOne(decoded.jti);
+            token = await this.accessTokenRepository.findOne({
+              id: decoded.jti,
+              revoked: false,
+            }, { relations: ['user'] });
           }
         break;
         case TokenType.REFRESH_TOKEN:
           if ('id' in decoded) {
-            token = await this.refreshTokenRepository.findOne(decoded.id);
+            token = await this.refreshTokenRepository.findOne({
+              id: decoded.id,
+              revoked: false,
+            });
           }
         break;
       }
     // Else, try to determine the type
     } else if (isAccessTokenPayload(decoded)) {
       if ('jti' in decoded) {
-        token = await this.accessTokenRepository.findOne(decoded.jti, {
-          relations: ['user'],
-        });
+        token = await this.accessTokenRepository.findOne({
+          id: decoded.jti,
+          revoked: false,
+        }, { relations: ['user'] });
       }
     } else {
-      token = await this.refreshTokenRepository.findOne(decoded.id);
+      token = await this.refreshTokenRepository.findOne({
+        id: decoded.id,
+        revoked: false,
+      });
     }
     return {
       token,
@@ -118,7 +152,7 @@ export class TokenService extends OAuthService {
 
       const expired = payload.exp * 1000 < Date.now();
       /**
-       * A token is valid if:
+       * An access_token is valid if:
        * * the corresponding OAuthAccessToken exists in the DB
        * * is not expired
        * * is not revoked
@@ -128,9 +162,9 @@ export class TokenService extends OAuthService {
 
       return {
         active,
-        scope: accessToken.scopes.join(' '),
-        client_id: accessToken.clientId,
-        username: (await accessToken.user).email,
+        scope: accessToken && accessToken.scopes.join(' '),
+        client_id: accessToken && accessToken.clientId,
+        username: accessToken && (await accessToken.user).email,
         exp: payload.exp,
       };
     } else {
@@ -139,7 +173,7 @@ export class TokenService extends OAuthService {
 
       const expired = payload.expiresAt * 1000 < Date.now();
       /**
-       * A token is valid if:
+       * A refresh_token is valid if:
        * * the corresponding OAuthRefreshToken exists in the DB
        * * is not expired
        * * is not revoked
@@ -167,14 +201,6 @@ export class TokenService extends OAuthService {
       await this.refreshTokenRepository.save(token);
     }
     return true;
-  }
-
-  protected async decryptJwt(token: string) {
-    try {
-      return await this.jwtService.verify(token, 'access_token');
-    } catch (e) {
-      return false;
-    }
   }
 
   protected decryptCipher(token: string) {

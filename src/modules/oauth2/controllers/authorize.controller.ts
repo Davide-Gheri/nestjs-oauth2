@@ -7,10 +7,10 @@ import { Request, Response } from 'express';
 import { PromptTypes } from '../constants';
 import { AuthorizeForbiddenExceptionFilter } from '../filters/authorize-forbidden-exception.filter';
 import { AuthorizeGuard, ClientAuthGuard, PkceGuard } from '../guards';
-import { OAuthExceptionFilter } from '../filters';
+import { OAuthExceptionFilter, RFC6749ExceptionFilter } from '../filters';
 import { getAuthRequestFromSession, handleResponseMode } from '@app/modules/oauth2/utils';
 
-@UseFilters(AuthorizeForbiddenExceptionFilter, OAuthExceptionFilter)
+@UseFilters(AuthorizeForbiddenExceptionFilter, RFC6749ExceptionFilter, OAuthExceptionFilter)
 @Controller('oauth2')
 export class AuthorizeController {
   constructor(

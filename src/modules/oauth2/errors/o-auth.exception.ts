@@ -5,7 +5,7 @@ export class OAuthException extends HttpException {
 
   constructor(
     error: string,
-    error_description: string,
+    error_description?: string,
     httpStatusCode = HttpStatus.BAD_REQUEST,
   ) {
     super(

@@ -7,6 +7,7 @@ import { ModuleRef } from '@nestjs/core';
 import { InjectRepository } from '@nestjs/typeorm';
 import { OAuthAccessToken, OAuthRefreshToken } from '@app/entities';
 import { Repository } from 'typeorm';
+import { TOKEN_STRATEGY, TokenStrategy } from '@app/modules/oauth2/modules/common/token';
 
 @Injectable()
 export abstract class OAuthService implements OnModuleInit {
@@ -16,6 +17,9 @@ export abstract class OAuthService implements OnModuleInit {
 
   @Inject(JwtService)
   protected readonly jwtService: JwtService;
+
+  @Inject(TOKEN_STRATEGY)
+  protected readonly tokenStrategy: TokenStrategy;
 
   @Inject(CipherService)
   protected readonly cipherService: CipherService;
