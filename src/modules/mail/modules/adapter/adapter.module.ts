@@ -13,4 +13,4 @@ import { HandlebarsAdapter } from './handlebars.adapter';
     HandlebarsAdapter,
   ],
 })
-export class AdepterModule {}
+export class AdapterModule {}

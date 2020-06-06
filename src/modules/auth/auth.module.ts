@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { forwardRef, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '@app/entities';
@@ -6,12 +6,12 @@ import { SessionSerializer } from './serializers';
 import { PassportModule } from '@nestjs/passport';
 import csurf from 'csurf';
 import { LoginController, LogoutController, RegisterController } from './controllers';
-import { AuthService, RegisterService } from './services';
 import { AuthenticatedGuard, GuestGuard, JwtGuard, LoginGuard } from './guards';
 import { GuestExceptionFilter } from './filters';
 import { APP_FILTER } from '@nestjs/core';
 import { JwtStrategy, LocalStrategy } from './strategies';
 import { JwtModule } from '@app/lib/jwt';
+import { UserModule } from '@app/modules/user';
 
 @Module({
   imports: [
@@ -22,13 +22,12 @@ import { JwtModule } from '@app/lib/jwt';
       defaultStrategy: 'local',
     }),
     JwtModule,
+    forwardRef(() => UserModule),
   ],
   providers: [
     SessionSerializer,
     LocalStrategy,
     JwtStrategy,
-    RegisterService,
-    AuthService,
     LoginGuard,
     AuthenticatedGuard,
     GuestGuard,
@@ -44,8 +43,6 @@ import { JwtModule } from '@app/lib/jwt';
     LogoutController,
   ],
   exports: [
-    AuthService,
-    RegisterService,
     GuestGuard,
     LoginGuard,
     AuthenticatedGuard,

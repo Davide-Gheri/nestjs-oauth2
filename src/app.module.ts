@@ -8,6 +8,8 @@ import { RedisModule } from '@app/lib/redis';
 import { AuthModule } from './modules/auth';
 import { OAuth2Module } from './modules/oauth2/oauth2.module';
 import { OpenIdModule } from './modules/openid/open-id.module';
+import { UserModule } from '@app/modules/user';
+import { MailModule } from '@app/modules/mail';
 
 @Module({
   imports: [
@@ -29,9 +31,11 @@ import { OpenIdModule } from './modules/openid/open-id.module';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => config.get('redis'),
     }),
+    MailModule,
     AuthModule,
     OAuth2Module,
     OpenIdModule,
+    UserModule,
   ],
   controllers: [AppController],
 })

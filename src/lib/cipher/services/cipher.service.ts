@@ -76,6 +76,11 @@ export class CipherService {
     return farmhash.fingerprint32(Buffer.from(data));
   }
 
+  farmHashVerify(value: string, hashed: string | number) {
+    const hashedValue = this.farmHash(value).toString();
+    return hashedValue === hashed.toString();
+  }
+
   /**
    * Hash a string using argon2
    * @param value

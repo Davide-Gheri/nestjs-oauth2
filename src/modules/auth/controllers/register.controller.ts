@@ -1,13 +1,14 @@
-import { Body, Controller, Get, Post, Render, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, forwardRef, Get, Inject, Post, Render, Req, Res, UseGuards } from '@nestjs/common';
 import { RegisterDto } from '../dtos';
-import { RegisterService } from '../services';
 import { Request, Response } from 'express';
 import { GuestGuard } from '../guards';
+import { RegisterService } from '@app/modules/user';
 
 @UseGuards(GuestGuard)
 @Controller('auth')
 export class RegisterController {
   constructor(
+    @Inject(forwardRef(() => RegisterService))
     private readonly registerService: RegisterService,
   ) {}
 

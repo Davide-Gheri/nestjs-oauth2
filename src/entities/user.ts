@@ -20,7 +20,7 @@ export class User extends BaseEntity {
   @Column({ type: 'varchar', unique: true })
   email: string;
 
-  @Column({ type: 'time without time zone', nullable: true })
+  @Column({ type: 'timestamp without time zone', nullable: true })
   emailVerifiedAt: Date;
 
   @Column({ type: 'varchar', nullable: true })

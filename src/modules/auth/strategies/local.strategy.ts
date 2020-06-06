@@ -1,13 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-local';
-import { AuthService } from '../services';
 import { User } from '@app/entities';
+import { UserService } from '@app/modules/user';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
   constructor(
-    private readonly authService: AuthService,
+    @Inject(forwardRef(() => UserService))
+    private readonly userService: UserService,
   ) {
     super({
       usernameField: 'email',
@@ -15,6 +16,6 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(email: string, password: string): Promise<User> {
-    return this.authService.authenticate({ email, password });
+    return this.userService.findAndAuthenticate({ email, password });
   }
 }

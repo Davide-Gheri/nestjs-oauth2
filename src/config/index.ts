@@ -5,3 +5,4 @@ export * from './jwt';
 export * from './redis';
 export * from './oauth';
 export * from './cert';
+export * from './mail';
