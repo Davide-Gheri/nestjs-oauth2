@@ -1,0 +1,21 @@
+overwrite: true
+schema:
+  - "../schema.graphql"
+  - "./src/apollo/typeDefs.ts"
+documents:
+  - "src/**/*.{ts,tsx}"
+generates:
+  src/generated/graphql.tsx:
+    plugins:
+      -   add: '/* eslint-disable */'
+      - "typescript"
+      - "typescript-operations"
+      - "typescript-react-apollo"
+      - "fragment-matcher"
+    config:
+      gqlImport: "@apollo/client#gql"
+      withHOC: false
+      withHooks: false
+      withMutationFn: false
+      withComponent: false
+      apolloReactCommonImportFrom: "@apollo/client"
