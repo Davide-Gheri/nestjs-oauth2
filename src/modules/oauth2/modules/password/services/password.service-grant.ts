@@ -8,7 +8,7 @@ import { OAuthException } from '@app/modules/oauth2/errors';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-@InjectableGrant(GrantTypes.PASSWORD)
+@InjectableGrant(GrantTypes.password)
 export class PasswordServiceGrant extends AbstractGrant {
   constructor(
     @InjectRepository(User)

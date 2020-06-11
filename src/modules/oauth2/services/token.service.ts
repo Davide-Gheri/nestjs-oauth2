@@ -28,7 +28,7 @@ export class TokenService extends OAuthService {
     /**
      * Use the requested grant to issue the token(s)
      */
-    const { accessToken, user, refreshToken } = await grant.respondToAccessTokenRequest(req, body);
+    const { accessToken, user, refreshToken, scopes } = await grant.respondToAccessTokenRequest(req, body);
 
     const response: AccessTokenResponse = {
       type: 'Bearer',
@@ -45,7 +45,7 @@ export class TokenService extends OAuthService {
     }
 
     // issuing or not an id_token is based on the requested scope and if the at is bound to an user
-    if (this.shouldIssueIdToken(body) && user) {
+    if (this.shouldIssueIdToken(body, scopes) && user) {
       // Id tokens are always JWT
       response.id_token = await this.jwtService.sign({
         aud: accessToken.clientId,
@@ -63,8 +63,12 @@ export class TokenService extends OAuthService {
   /**
    * Check if the response should include an id_token
    * @param body
+   * @param scopes
    */
-  protected shouldIssueIdToken(body: TokenDto): boolean {
+  protected shouldIssueIdToken(body: TokenDto, scopes?: string[]): boolean {
+    if (scopes) {
+      return scopes.includes('openid') && grantsWithIdToken.includes(body.grant_type);
+    }
     return body.scopes.includes('openid') && grantsWithIdToken.includes(body.grant_type);
   }
 
@@ -81,7 +85,7 @@ export class TokenService extends OAuthService {
       // It could be a Refresh Token, try to decrypt it
       decoded = this.decryptCipher(encrypted);
       if (decoded) { // Found, force as refresh_token
-        hint = TokenType.REFRESH_TOKEN;
+        hint = TokenType.refresh_token;
       }
     }
 
@@ -95,7 +99,7 @@ export class TokenService extends OAuthService {
     // If a token hint is passed, use it to choose which repository to use to retrieve the token from the DB
     if (hint) {
       switch (hint) {
-        case TokenType.ACCESS_TOKEN:
+        case TokenType.access_token:
           if ('jti' in decoded) {
             token = await this.accessTokenRepository.findOne({
               id: decoded.jti,
@@ -103,7 +107,7 @@ export class TokenService extends OAuthService {
             }, { relations: ['user'] });
           }
         break;
-        case TokenType.REFRESH_TOKEN:
+        case TokenType.refresh_token:
           if ('id' in decoded) {
             token = await this.refreshTokenRepository.findOne({
               id: decoded.id,

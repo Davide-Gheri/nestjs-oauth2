@@ -17,7 +17,7 @@ export class AuthorizeForbiddenExceptionFilter extends AuthForbiddenExceptionFil
     /**
      * If prompt=none, redirect to the redirect_uri with error
      */
-    if (req.query.prompt === PromptTypes.NONE) {
+    if (req.query.prompt === PromptTypes.none) {
       const url = new URL(req.query.redirect_uri);
       url.search = qs.stringify({
         error: 'login_required',
@@ -28,10 +28,10 @@ export class AuthorizeForbiddenExceptionFilter extends AuthForbiddenExceptionFil
        * We need to replace prompt=login with the default consent, otherwise it end in a login form loop
        * (The guard will see again prompt=login, will log out the user and so on)
        */
-    } else if (req.query.prompt === PromptTypes.LOGIN) {
+    } else if (req.query.prompt === PromptTypes.login) {
       const [baseUrl] = req.originalUrl.split('?');
       const newQuery = { ...req.query };
-      newQuery.prompt = PromptTypes.CONSENT;
+      newQuery.prompt = PromptTypes.consent;
 
       return super.catch(exception, host, `${baseUrl}?${qs.stringify(newQuery)}`)
     }

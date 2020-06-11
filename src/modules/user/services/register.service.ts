@@ -6,6 +6,7 @@ import { ConfigService } from '@nestjs/config';
 import estimator from 'zxcvbn';
 import { MailService } from '@app/modules/mail';
 import { CipherService } from '@app/lib/cipher';
+import { PasswordService } from '@app/modules/user/services/password.service';
 
 @Injectable()
 export class RegisterService {
@@ -15,12 +16,16 @@ export class RegisterService {
     private readonly cipherService: CipherService,
     @InjectRepository(User)
     public readonly repository: Repository<User>,
+    private readonly passwordService: PasswordService,
   ) {}
 
   async register(data: Partial<User>) {
-    const passwordError = this.checkPasswordStrength(data.password);
+    const passwordError = this.passwordService.checkPasswordStrength(data.password);
     if (passwordError) {
       throw new BadRequestException([passwordError]);
+    }
+    if ((await this.repository.count({ email: data.email })) > 0) {
+      throw new BadRequestException(['Email already used']);
     }
     const user = await this.repository.save(
       this.repository.create({
@@ -28,7 +33,9 @@ export class RegisterService {
         emailVerifiedAt: null,
       }),
     );
-    await this.sendWelcomeEmail(user);
+    if (this.config.get('app.shouldSendWelcomeEmail')) {
+      await this.sendWelcomeEmail(user);
+    }
 
     return user;
   }
@@ -41,14 +48,6 @@ export class RegisterService {
       idHash: idHash.toString(),
       emailHash: emailHash.toString(),
     })
-  }
-
-  checkPasswordStrength(pass: string) {
-    const result = estimator(pass);
-    if (result.score < this.config.get('app.security.minPasswordScore')) {
-      return result.feedback.warning || result.feedback.suggestions[0];
-    }
-    return null;
   }
 
   async verifyEmail(user: User, idHash: string, emailHash: string) {

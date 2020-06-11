@@ -6,3 +6,4 @@ export * from './redis';
 export * from './oauth';
 export * from './cert';
 export * from './mail';
+export * from './management';

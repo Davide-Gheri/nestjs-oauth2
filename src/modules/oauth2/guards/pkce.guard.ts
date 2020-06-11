@@ -22,14 +22,14 @@ function createPkceGuard(step: 'challenge' | 'verifier'): Type<IPkceGuard> {
       const client: OAuthClient = req.client;
       switch (step) {
         case 'challenge':
-          if (client.canHandleAuthMethod(TokenAuthMethod.NONE)) {
+          if (client.canHandleAuthMethod(TokenAuthMethod.none)) {
             if (!req.query.code_challenge || !req.query.code_challenge_method) {
               throw OAuthException.invalidRequest('code_challenge');
             }
           }
           return true;
         case 'verifier':
-          if (client.canHandleAuthMethod(TokenAuthMethod.NONE)) {
+          if (client.canHandleAuthMethod(TokenAuthMethod.none)) {
             if (!req.body.code_verifier) {
               throw OAuthException.invalidRequest('code_verifier');
             }

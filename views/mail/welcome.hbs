@@ -1,6 +1,7 @@
-
+{{#extend "mail"}}
+{{#content "body"}}
 <div>
-    <p>Welcome {{name}}</p>
+    <p>Welcome {{nickname}}</p>
 
     <p>
         Click the button below to activate your account
@@ -12,3 +13,6 @@
 
     <a href="{{link}}">Activate me</a>
 </div>
+
+{{/content}}
+{{/extend}}

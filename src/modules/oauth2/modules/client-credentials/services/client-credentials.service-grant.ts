@@ -4,7 +4,7 @@ import { Request } from 'express';
 import { TokenDto } from '@app/modules/oauth2/dto';
 import { AccessTokenRequestResponse } from '@app/modules/oauth2/interfaces';
 
-@InjectableGrant(GrantTypes.CLIENT_CREDENTIALS)
+@InjectableGrant(GrantTypes.client_credentials)
 export class ClientCredentialsServiceGrant extends AbstractGrant {
   async respondToAccessTokenRequest(req: Request, body: TokenDto): Promise<AccessTokenRequestResponse> {
     const client = await this.getClient(body, req);

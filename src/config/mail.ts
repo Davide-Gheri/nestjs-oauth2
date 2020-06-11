@@ -1,6 +1,7 @@
 import { registerAs } from '@nestjs/config';
 import { MailerOptions } from '@nestjs-modules/mailer';
 import { ConfigFactory } from '@nestjs/config/dist/interfaces';
+import { resolve } from 'path';
 
 export const mail = registerAs<ConfigFactory>('mail', () => ({
   config: {
@@ -11,7 +12,17 @@ export const mail = registerAs<ConfigFactory>('mail', () => ({
         address: process.env.MAIL_FROM || 'ingo@argo.com',
       },
     },
+    template: {
+      dir: resolve(__dirname, '..', '..', 'views/mail'),
+      options: {
+        strict: true,
+      },
+    },
   },
+  partials: [
+    resolve(__dirname, '..', '..', 'views/partials'),
+    resolve(__dirname, '..', '..', 'views/layouts')
+  ],
   queue: {
     prefix: process.env.NODE_UID || 'argo',
     defaultJobOptions: {

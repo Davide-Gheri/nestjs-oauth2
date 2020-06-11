@@ -12,4 +12,12 @@ export class LoginGuard extends AuthGuard('local') {
     await super.logIn(request);
     return result;
   }
+
+  handleRequest(err, user, info, context, status): any {
+    const ensuredUser = super.handleRequest(err, user, info, context, status);
+    return {
+      user: ensuredUser,
+      info,
+    }
+  }
 }

@@ -17,7 +17,7 @@ export class AuthorizeGuard extends AuthenticatedGuard {
      * We log out the user, thus the parent class will throw a ForbiddenException,
      * catch (@see AuthorizeForbiddenExceptionFilter) to redirect to the login page
      */
-    if (query.prompt === PromptTypes.LOGIN) {
+    if (query.prompt === PromptTypes.login) {
       req.logout();
     }
 

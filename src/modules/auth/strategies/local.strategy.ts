@@ -3,6 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-local';
 import { User } from '@app/entities';
 import { UserService } from '@app/modules/user';
+import { Request } from 'express';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
@@ -12,10 +13,18 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   ) {
     super({
       usernameField: 'email',
+      passReqToCallback: true,
     });
   }
 
-  async validate(email: string, password: string): Promise<User> {
-    return this.userService.findAndAuthenticate({ email, password });
+  async validate(req: Request, email: string, password: string): Promise<[User, any]> {
+    return [
+      await this.userService.findAndAuthenticate({ email, password }),
+      {
+        ip: req.ip,
+        userAgent: req.headers['user-agent'],
+        createdAt: Date.now(),
+      }
+    ];
   }
 }

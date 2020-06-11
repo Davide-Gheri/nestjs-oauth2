@@ -6,7 +6,7 @@ import { AccessTokenRequestResponse } from '@app/modules/oauth2/interfaces';
 import { OAuthException } from '@app/modules/oauth2/errors';
 import { OAuthAccessToken, OAuthRefreshToken } from '@app/entities';
 
-@InjectableGrant(GrantTypes.REFRESH_TOKEN)
+@InjectableGrant(GrantTypes.refresh_token)
 export class RefreshTokenServiceGrant extends AbstractGrant {
   async respondToAccessTokenRequest(req: Request, body: TokenDto): Promise<AccessTokenRequestResponse> {
     const client = await this.getClient(body, req);

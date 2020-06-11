@@ -21,11 +21,11 @@ export const handleResponseMode = (
   params: Record<string, any>,
 ) => {
   switch (responseMode) {
-    case ResponseModes.QUERY:
+    case ResponseModes.query:
       return res.status(302).redirect(this.makeRedirectUri(returnTo, params));
-    case ResponseModes.FRAGMENT:
+    case ResponseModes.fragment:
       return res.status(302).redirect(this.makeRedirectUri(returnTo, undefined, params));
-    case ResponseModes.FORM_POST:
+    case ResponseModes.form_port:
       return res.render('form_post', {
         returnTo,
         hiddenFields: params,

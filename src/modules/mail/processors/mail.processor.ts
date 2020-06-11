@@ -5,7 +5,7 @@ import { Job } from 'bull';
 import { User } from '@app/entities';
 import { ConfigService } from '@nestjs/config';
 import { Logger } from '@nestjs/common';
-import { classToPlain } from 'class-transformer';
+import { classToPlain, plainToClass } from 'class-transformer';
 import { UrlSignService } from '@app/lib/sign';
 
 @Processor(MAIL_QUEUE)
@@ -43,7 +43,7 @@ export class MailProcessor {
     return this.mailService.sendMail({
       template: 'welcome',
       context: {
-        ...classToPlain(job.data.user),
+        ...plainToClass(User, job.data.user),
         link: this.urlSignService.sign(`${this.config.get('app.appUrl')}${uri}`),
       },
       subject: `Welcome to Argo services`,

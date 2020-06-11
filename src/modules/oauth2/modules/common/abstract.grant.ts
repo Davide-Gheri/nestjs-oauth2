@@ -96,16 +96,18 @@ export abstract class AbstractGrant implements GrantInterface {
     return client;
   }
 
-  protected shouldIssueRefreshToken(body: TokenDto): boolean {
+  protected shouldIssueRefreshToken(body: TokenDto, scopes?: string[]): boolean {
+    if (scopes) {
+      return scopes.includes('offline_access') && grantsWithRefreshToken.includes(body.grant_type);
+    }
     return body.scopes.includes('offline_access') && grantsWithRefreshToken.includes(body.grant_type);
   }
 
   protected async returnAccessTokenResponse(
-    { em, user, client, body }: { em: EntityManager; user?: User; client: OAuthClient; body: TokenDto }
+    { em, user, client, body, scopes }: { em: EntityManager; user?: User; client: OAuthClient; body: TokenDto; scopes?: string[] }
   ): Promise<AccessTokenRequestResponse> {
-    const scopes = this.validateScope(client, body.scopes);
     const accessTokenRepo = em.getRepository(OAuthAccessToken);
-    const accessToken = await this.issueAccessToken(client, user?.id || null, scopes, accessTokenRepo);
+    const accessToken = await this.issueAccessToken(client, user?.id || null, this.validateScope(client, scopes || body.scopes), accessTokenRepo);
 
     const response: AccessTokenRequestResponse = {
       accessToken,

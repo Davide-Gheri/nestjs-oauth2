@@ -11,8 +11,8 @@ export class AuthRequest {
   public readonly redirectUri: string;
   public scopes: string[];
   public readonly state: string;
-  public readonly responseMode: ResponseModes = ResponseModes.QUERY;
-  public readonly responseType: ResponseTypes = ResponseTypes.CODE;
+  public readonly responseMode: ResponseModes = ResponseModes.query;
+  public readonly responseType: ResponseTypes = ResponseTypes.code;
 
   constructor(partial: Partial<AuthRequest>) {
     Object.assign(this, partial);

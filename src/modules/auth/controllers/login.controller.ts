@@ -1,4 +1,4 @@
-import { Controller, Get, Req, UseGuards, Render, Post, Body, Query, Res, Session } from '@nestjs/common';
+import { Controller, Req, UseGuards, Post, Body, Query, Res, Session, Get, Render } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { GuestGuard, LoginGuard } from '../guards';
 import { LoginDto } from '../dtos';
@@ -24,16 +24,22 @@ export class LoginController {
       session.cookie.expires = false;
     }
 
+    if (req.accepts('json')) {
+      return res.json({
+        returnTo: intended || '/',
+      });
+    }
+
     res.redirect(intended || '/');
   }
 
   @Get('login')
-  @Render('login')
+  @Render('index')
   showLoginForm(
     @Req() req: Request,
   ) {
     return {
-      csrf: req.csrfToken(),
+      csrfToken: req.csrfToken(),
     }
   }
 }

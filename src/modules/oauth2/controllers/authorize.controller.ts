@@ -10,7 +10,7 @@ import { AuthorizeGuard, ClientAuthGuard, PkceGuard } from '../guards';
 import { OAuthExceptionFilter, RFC6749ExceptionFilter } from '../filters';
 import { getAuthRequestFromSession, handleResponseMode } from '@app/modules/oauth2/utils';
 
-@UseFilters(AuthorizeForbiddenExceptionFilter, RFC6749ExceptionFilter, OAuthExceptionFilter)
+@UseFilters(RFC6749ExceptionFilter, AuthorizeForbiddenExceptionFilter, OAuthExceptionFilter)
 @Controller('oauth2')
 export class AuthorizeController {
   constructor(
@@ -52,7 +52,7 @@ export class AuthorizeController {
         returnTo,
         { state, code },
       );
-    } else if (query.prompt === PromptTypes.NONE) {
+    } else if (query.prompt === PromptTypes.none) {
       /**
        * Consent cannot be skipped but the request does not permit user interaction
        * Redirect to the redirect_uri with an error
@@ -72,11 +72,11 @@ export class AuthorizeController {
      * save the AuthRequest to the session and show the consent form
      */
     session.authRequest = authRequest;
-    return res.render('consent', {
+    return res.render('index', {
       client: authRequest.client,
       user: user,
       scopes: authRequest.scopes,
-      csrf: req.csrfToken(),
+      csrfToken: req.csrfToken(),
     });
   }
 
@@ -102,7 +102,7 @@ export class AuthorizeController {
     /**
      * A user can override the requested scopes, replace the user defined with the originally requested
      */
-    authRequest.scopes = data.scopes || [];
+    authRequest.scopes = (data.scopes || []).filter(Boolean);
     /**
      * Generate the auth code and successfully redirect to the redirect_uri
      */

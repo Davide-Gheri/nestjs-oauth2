@@ -11,7 +11,7 @@ import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.excepti
 import { Repository } from 'typeorm';
 import { AuthCodeService } from './auth-code.service';
 
-@InjectableGrant(GrantTypes.AUTHORIZATION_CODE)
+@InjectableGrant(GrantTypes.authorization_code)
 export class AuthorizationCodeServiceGrant extends AbstractGrant {
   constructor(
     protected readonly authCodeService: AuthCodeService,
@@ -69,13 +69,7 @@ export class AuthorizationCodeServiceGrant extends AbstractGrant {
   async respondToAccessTokenRequest(req: Request, body: TokenDto): Promise<AccessTokenRequestResponse> {
     const client = await this.getClient(body, req);
     const authCode = await this.authCodeService.getFromCode(body.code, client, body.code_verifier);
-    const scopes = this.validateScope(client, body.scopes);
-    scopes.forEach(scope => {
-      if (!authCode.scopes.includes(scope)) {
-        this.logger.warn(`Requested unauthorized scope ${scope}`);
-        throw OAuthException.invalidScope(scope);
-      }
-    });
+    const scopes = this.validateScope(client, body.scopes).filter(scope => authCode.scopes.includes(scope));
 
     if (authCode.clientId !== client.id) {
       this.logger.warn(`Authorization code ${authCode.id} do not belongs to the client ${client.id}`);
@@ -84,10 +78,12 @@ export class AuthorizationCodeServiceGrant extends AbstractGrant {
     await this.validateRedirectUri(body.redirect_uri, client, authCode);
 
     return this.connection.transaction(async em => {
-      const response = await this.returnAccessTokenResponse({ em, user: authCode.user, client, body });
+      const response = await this.returnAccessTokenResponse({ em, user: authCode.user, client, body, scopes });
 
       const authCodeRepo = em.getRepository(OAuthCode);
       await this.authCodeService.revoke(authCodeRepo, authCode);
+
+      response.scopes = scopes;
 
       return response;
     })

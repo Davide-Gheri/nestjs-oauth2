@@ -5,8 +5,8 @@ import bodyParser from 'body-parser';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import passport from 'passport';
-import hbs from 'express-handlebars';
-import { resolve } from 'path';
+import hbs from 'hbs';
+import { join, resolve } from 'path';
 
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
@@ -34,6 +34,22 @@ async function bootstrap() {
     saveUninitialized: false,
   }));
 
+  hbs.registerHelper('json', (ctx: any) => {
+    delete ctx.settings;
+    delete ctx.cache;
+    delete ctx._locals;
+    return JSON.stringify(ctx);
+  });
+  app.set('view engine', 'html');
+  app.engine('html', hbs.__express);
+
+  const clientDir = resolve(__dirname, '..', 'client');
+
+  app.setBaseViewsDir(join(clientDir, 'views'));
+  app.useStaticAssets(join(clientDir, 'build'), {
+    // prefix: '/app',
+  });
+
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(cookieParser(secret));
@@ -41,23 +57,11 @@ async function bootstrap() {
   if (process.env.NODE_ENV === 'production') {
     app.use(rateLimit(config.get<any>('rateLimit')));
   }
+
   app.use(helmet());
   app.use(passport.initialize());
   app.use(passport.session());
   app.enableShutdownHooks();
-
-  app.set('view engine', 'hbs');
-  app.engine('hbs', hbs({
-    extname: 'hbs',
-    layoutsDir: resolve(__dirname, '..', 'views/layouts/'),
-    partialsDir: resolve(__dirname, '..', 'views/partials/'),
-    defaultLayout: 'main',
-    helpers: {
-      jsonPretty: ctx => JSON.stringify(ctx, null, 2),
-    },
-  }));
-
-  app.setBaseViewsDir(resolve(__dirname, '../views'));
 
   await app.listen(config.get('app.port'));
 }

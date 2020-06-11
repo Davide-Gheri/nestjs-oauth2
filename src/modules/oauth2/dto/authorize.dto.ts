@@ -26,7 +26,7 @@ export class AuthorizeDto {
 
   @IsOptional()
   @IsEnum(ResponseModes, { message: `response_mode must be one of: ${Object.values(ResponseModes)}` })
-  response_mode: ResponseModes = ResponseModes.QUERY;
+  response_mode: ResponseModes = ResponseModes.query;
 
   @IsNotEmpty()
   @IsEnum(ResponseTypes, { message: `response_type must be one of: ${Object.values(ResponseTypes)}` })
@@ -38,7 +38,7 @@ export class AuthorizeDto {
 
   @IsOptional()
   @IsEnum(PromptTypes, { message: `prompt must be one of: ${Object.values(PromptTypes)}` })
-  prompt: PromptTypes = PromptTypes.CONSENT;
+  prompt: PromptTypes = PromptTypes.consent;
 
   get scopes() {
     return (this.scope || '').split(' ').filter(Boolean);

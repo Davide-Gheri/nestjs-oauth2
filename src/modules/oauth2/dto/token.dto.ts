@@ -7,22 +7,22 @@ export class TokenDto {
   @IsEnum(GrantTypes, { message: `grant_type must be one of: ${Object.values(GrantTypes)}` })
   grant_type: GrantTypes;
 
-  @ValidateIf((o: TokenDto) => o.grant_type === GrantTypes.PASSWORD)
+  @ValidateIf((o: TokenDto) => o.grant_type === GrantTypes.password)
   @IsNotEmpty()
   @IsEmail()
   username: string;
 
-  @ValidateIf((o: TokenDto) => o.grant_type === GrantTypes.PASSWORD)
+  @ValidateIf((o: TokenDto) => o.grant_type === GrantTypes.password)
   @IsNotEmpty()
   @IsString()
   password: string;
 
-  @ValidateIf((o: TokenDto) => o.grant_type === GrantTypes.AUTHORIZATION_CODE)
+  @ValidateIf((o: TokenDto) => o.grant_type === GrantTypes.authorization_code)
   @IsNotEmpty()
   @IsString()
   code: string;
 
-  @ValidateIf((o: TokenDto) => o.grant_type === GrantTypes.AUTHORIZATION_CODE)
+  @ValidateIf((o: TokenDto) => o.grant_type === GrantTypes.authorization_code)
   @IsNotEmpty()
   @IsString()
   redirect_uri: string;
@@ -31,7 +31,7 @@ export class TokenDto {
   @IsString()
   code_verifier: string;
 
-  @ValidateIf((o: TokenDto) => o.grant_type === GrantTypes.REFRESH_TOKEN)
+  @ValidateIf((o: TokenDto) => o.grant_type === GrantTypes.refresh_token)
   @IsNotEmpty()
   @IsString()
   refresh_token: string;

@@ -13,6 +13,7 @@ export interface AccessTokenRequestResponse {
   accessToken: OAuthAccessToken;
   refreshToken?: OAuthRefreshToken;
   user?: User;
+  scopes?: string[];
 }
 
 export interface AccessTokenResponse {

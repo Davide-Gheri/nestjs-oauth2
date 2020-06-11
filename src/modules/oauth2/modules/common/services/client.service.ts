@@ -23,12 +23,12 @@ export class ClientService {
       this.logger.warn(`Client ${clientId} not found`);
       throw OAuthException.invalidClient();
     }
-    if (validateSecret || type === TokenAuthMethod.CLIENT_SECRET_BASIC) {
+    if (validateSecret || type === TokenAuthMethod.client_secret_basic) {
       if (!client.canHandleAuthMethod(type)) {
         this.logger.warn(`Client does not support token_endpoint_auth_method ${type}`);
         throw OAuthException.invalidClient(`Unsupported auth method ${type}`);
       }
-      if (type !== TokenAuthMethod.NONE && (clientSecret !== client.secret || !clientSecret)) {
+      if (type !== TokenAuthMethod.none && (clientSecret !== client.secret || !clientSecret)) {
         this.logger.warn(`Client secret does not match`);
         throw OAuthException.invalidClient();
       }
@@ -43,7 +43,7 @@ export class ClientService {
         return {
           clientId: basicAuthUser,
           clientSecret: basicAuthPassword,
-          type: TokenAuthMethod.CLIENT_SECRET_BASIC,
+          type: TokenAuthMethod.client_secret_basic,
         }
       }
     }
@@ -53,7 +53,7 @@ export class ClientService {
     return {
       clientId: client_id,
       clientSecret: client_secret,
-      type: client_secret ? TokenAuthMethod.CLIENT_SECRET_POST : TokenAuthMethod.NONE,
+      type: client_secret ? TokenAuthMethod.client_secret_post : TokenAuthMethod.none,
     }
   }
 

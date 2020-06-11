@@ -50,7 +50,7 @@ export class AuthCodeService extends BaseTokenService<OAuthCode> {
       throw OAuthException.invalidRequest('code');
     }
 
-    if (client.canHandleAuthMethod(TokenAuthMethod.NONE)) {
+    if (client.canHandleAuthMethod(TokenAuthMethod.none)) {
       this.validateCodeChallenge(authCodeData, codeVerifier);
     }
 

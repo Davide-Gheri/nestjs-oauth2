@@ -50,11 +50,5 @@ import { UserModule } from '@app/modules/user';
 })
 export class AuthModule implements NestModule {
   configure(consumer: MiddlewareConsumer): any {
-    consumer.apply(csurf({ cookie: true }))
-      .exclude(
-        'oauth2/(.*)',
-        'debug/(.*)',
-      )
-      .forRoutes('*');
   }
 }

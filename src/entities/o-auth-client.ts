@@ -5,37 +5,50 @@ import { OAuthAccessToken } from './o-auth-access-token';
 import { randomBytes } from 'crypto';
 import { GrantTypes, ResponseModes, ResponseTypes, Scopes, TokenAuthMethod } from '@app/modules/oauth2/constants';
 import { BadRequestException } from '@nestjs/common';
+import { Field, ObjectType } from '@nestjs/graphql';
+import { JSONResolver } from 'graphql-scalars';
 
+@ObjectType()
 @Entity()
 export class OAuthClient extends BaseEntity {
+  @Field()
   @Column({ type: 'varchar' })
   name: string;
 
+  @Field()
   @Column({ type: 'varchar' })
   secret: string;
 
+  @Field(returns => [String])
   @Column({ type: 'varchar', array: true, nullable: false })
   redirect: string[];
 
+  @Field(returns => JSONResolver)
   @Column({ type: 'json', default: {} })
   meta: OAuthClientMeta;
 
-  @Column({ type: 'varchar', array: true, default: `{${GrantTypes.AUTHORIZATION_CODE}}` })
+  @Field(returns => [GrantTypes])
+  @Column({ type: 'varchar', array: true, default: `{${GrantTypes.authorization_code}}` })
   grantTypes: GrantTypes[];
 
-  @Column({ type: 'varchar', array: true, default: `{${ResponseTypes.CODE}}` })
+  @Field(returns => [ResponseTypes])
+  @Column({ type: 'varchar', array: true, default: `{${ResponseTypes.code}}` })
   responseTypes: ResponseTypes[];
 
-  @Column({ type: 'varchar', array: true, default: `{${ResponseModes.QUERY}}` })
+  @Field(returns => [ResponseModes])
+  @Column({ type: 'varchar', array: true, default: `{${ResponseModes.query}}` })
   responseModes: ResponseModes[];
 
+  @Field(returns => [String])
   @Column({ type: 'varchar', array: true, default: `{${Object.values(Scopes).join(',')}}` })
   scopes: string[];
 
+  @Field()
   @Column({ type: 'boolean', default: false })
   firstParty: boolean;
 
-  @Column({ type: 'varchar', array: true, default: `{${TokenAuthMethod.CLIENT_SECRET_BASIC},${TokenAuthMethod.CLIENT_SECRET_POST}}` })
+  @Field(returns => [TokenAuthMethod])
+  @Column({ type: 'varchar', array: true, default: `{${TokenAuthMethod.client_secret_basic},${TokenAuthMethod.client_secret_post}}` })
   authMethods: TokenAuthMethod[];
 
   @OneToMany(type => OAuthCode, code => code.client)
@@ -74,8 +87,10 @@ export class OAuthClient extends BaseEntity {
   @BeforeInsert()
   @BeforeUpdate()
   checkAuthMethods() {
-    if (this.authMethods.includes(TokenAuthMethod.NONE) && this.authMethods.length > 1) {
-      throw new BadRequestException('Client with token_endpoint_auth_method=none cannot have other auth methods');
+    if (this.authMethods) {
+      if (this.authMethods.includes(TokenAuthMethod.none) && this.authMethods.length > 1) {
+        throw new BadRequestException('Client with token_endpoint_auth_method=none cannot have other auth methods');
+      }
     }
   }
 }
