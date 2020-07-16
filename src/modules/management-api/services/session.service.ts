@@ -2,13 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { User } from '@app/entities';
 import { Request } from 'express';
 import { RedisStore } from 'connect-redis';
-import { SerializedSessionPayload } from '@app/modules/auth/interfaces';
+import { SerializedPassportSessionPayload } from '@app/modules/auth/interfaces';
 import { Session } from '../types';
 import * as UAParser from 'ua-parser-js';
 
 export interface SessionEntry {
   cookie: any;
-  passport: { user: SerializedSessionPayload };
+  passport: SerializedPassportSessionPayload;
   id: string;
 }
 
@@ -20,21 +20,24 @@ export class SessionService {
   ): Promise<Session[]> {
     const sessions = await this.getAllSessions(req);
 
-    return sessions.filter(sess => sess.passport?.user?.userId === user.id).map(sess => {
-      const parser = new UAParser.UAParser(sess.passport.user.info?.userAgent);
+    return sessions.filter(sess => sess.passport.user === user.id).map(sess => {
+      if (!sess.passport.info) {
+        return null;
+      }
+      const parser = new UAParser.UAParser(sess.passport.info.userAgent);
 
       const browser = parser.getBrowser();
       const os = parser.getOS();
 
       return {
         sessionId: sess.id,
-        ip: sess.passport.user.info?.ip,
+        ip: sess.passport.info.ip,
         userAgent: parser.getUA(),
         browser: `${browser.name}, v${browser.version}`,
         os: `${os.name} v${os.version}`,
-        createdAt: sess.passport.user.info.createdAt ? new Date(sess.passport.user.info.createdAt) : null,
+        createdAt: sess.passport.info.createdAt ? new Date(sess.passport.info.createdAt) : null,
       }
-    });
+    }).filter(Boolean);
   }
 
   async getUserSession(

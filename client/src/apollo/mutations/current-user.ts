@@ -13,3 +13,21 @@ gql`
       deleteSession(id: $id)
   }
 `;
+
+gql`
+  mutation RequestTfa {
+      requestTfa
+  }
+`;
+
+gql`
+  mutation VerifyTfa($code: String!) {
+      verifyTfa(code: $code)
+  }
+`;
+
+gql`
+  mutation DisableTfa {
+      disableTfa
+  }
+`;

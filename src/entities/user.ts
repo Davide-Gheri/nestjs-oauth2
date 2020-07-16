@@ -8,6 +8,7 @@ import { Scopes } from '@app/modules/oauth2/constants';
 import { Field, ObjectType } from '@nestjs/graphql';
 import { EmailAddressResolver } from 'graphql-scalars';
 import { Roles } from '@app/modules/auth/roles';
+import { SocialLogin } from '@app/entities/social-login.entity';
 
 @ObjectType()
 @Entity()
@@ -24,8 +25,8 @@ export class User extends BaseEntity {
   @Column({ type: 'varchar', nullable: true })
   lastName: string;
 
-  @Field(returns => EmailAddressResolver)
-  @Column({ type: 'varchar', unique: true })
+  @Field(returns => EmailAddressResolver, { nullable: true })
+  @Column({ type: 'varchar', unique: true, nullable: true })
   email: string;
 
   @Field({ nullable: true })
@@ -40,8 +41,20 @@ export class User extends BaseEntity {
   @Column({ type: 'varchar', enum: Roles, default: Roles.USER })
   role: Roles;
 
+  @Column({ type: 'varchar', nullable: true })
+  tfaSecret: string;
+
+  @Field()
+  @Column({ type: 'boolean', default: false })
+  tfaEnabled: boolean;
+
   @OneToMany(type => OAuthAccessToken, at => at.user)
   tokens: Promise<OAuthAccessToken>;
+
+  @OneToMany(type => SocialLogin, sl => sl.user, {
+    eager: true,
+  })
+  socialLogins: SocialLogin[];
 
   @Exclude()
   tmpPassword!: string;
@@ -49,7 +62,11 @@ export class User extends BaseEntity {
   @Field(returns => String)
   @Expose()
   get picture(): string {
-    return gravatar.url(this.email, {
+    let pictureUrl: string;
+    if (this.socialLogins.length) {
+      pictureUrl = this.socialLogins.find(s => s.picture)?.picture;
+    }
+    return pictureUrl || gravatar.url(this.email, {
       rating: 'g',
       default: 'retro',
     })

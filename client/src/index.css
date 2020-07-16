@@ -19,3 +19,17 @@ html. body. #root {
 *:focus {
   outline: none;
 }
+
+.code-input input::-webkit-outer-spin-button,
+.code-input input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.code-input input {
+  -moz-appearance: textfield;
+}
+
+.code-input input:nth-child(3) {
+  margin-right: 16px !important;
+}

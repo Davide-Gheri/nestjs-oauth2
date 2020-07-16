@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from '@app/entities';
+import { SocialLogin, User } from '@app/entities';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { RegisterService, UserService } from '@app/modules/user/services';
 import { MailModule } from '@app/modules/mail';
@@ -13,7 +13,7 @@ import { PasswordService } from '@app/modules/user/services/password.service';
 @Module({
   imports: [
     ConfigModule,
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, SocialLogin]),
     MailModule,
     SignModule.register({
       secret: 'secret',

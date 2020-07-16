@@ -5,13 +5,14 @@ import { Request } from 'express';
 import { classToPlain } from 'class-transformer';
 import { InjectRolesBuilder, RolesBuilder } from 'nest-access-control';
 import { ForbiddenExceptionFilter } from '@app/modules/auth/filters';
-import { RedisStore } from 'connect-redis';
+import { ConfigService } from '@nestjs/config';
 
 @Controller()
 export class AppController {
   constructor(
     @InjectRolesBuilder()
     private rb: RolesBuilder,
+    private readonly config: ConfigService,
   ) {}
 
   @Get('/')
@@ -25,6 +26,8 @@ export class AppController {
       grants: this.rb.getGrants(),
       csrfToken: req.csrfToken(),
       currentSession: req.session?.id,
+      facebookLoginUrl: this.config.get('social.facebook.loginUrl')(encodeURIComponent('/')),
+      googleLoginUrl: this.config.get('social.google.loginUrl')(encodeURIComponent('/')),
     }
   }
 
@@ -36,27 +39,6 @@ export class AppController {
     @Req() req: Request,
     @CurrentUser() user?: User,
   ) {
-    return {
-      grants: this.rb.getGrants(),
-      user: classToPlain(user),
-      csrfToken: req.csrfToken(),
-      currentSession: req.session?.id,
-    }
-  }
-
-  @Get('/sessions')
-  getSessions(
-    @Req() req: any,
-  ) {
-    const store = (req.sessionStore as RedisStore);
-
-    return new Promise((resolve, reject) => {
-      store.all((err, data) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(data);
-      })
-    });
+    return this.homepage(req, user);
   }
 }

@@ -10,6 +10,7 @@ export const dummyUser = {
   updatedAt: "2020-06-06T15:30:26.737Z",
   picture: "//www.gravatar.com/avatar/8c2eb5c7ebba92486dfdc3aa779649c1?rating=g&default=retro",
   role: "USER",
+  tfaEnabled: false,
 }
 
 export const dummyGrants = {

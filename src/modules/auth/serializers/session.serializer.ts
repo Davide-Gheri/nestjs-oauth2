@@ -4,7 +4,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { plainToClass } from 'class-transformer';
 import { User } from '@app/entities';
-import { SerializedSessionPayload, SessionPayload } from '@app/modules/auth/interfaces';
 
 /**
  * Specify how to serialize user data on the session cookie
@@ -23,11 +22,8 @@ export class SessionSerializer extends PassportSerializer {
    * @param data
    * @param done
    */
-  serializeUser(data: SessionPayload, done: (err: Error | null, data?: SerializedSessionPayload) => void): any {
-    done(null, {
-      userId: data.user.id,
-      info: data.info,
-    });
+  serializeUser(data: User, done: (err: Error | null, data?: string) => void): any {
+    done(null, data.id);
   }
 
   /**
@@ -35,8 +31,8 @@ export class SessionSerializer extends PassportSerializer {
    * @param payload
    * @param done
    */
-  async deserializeUser(payload: SerializedSessionPayload, done: (err: Error | null, data?: any) => void): Promise<any> {
-    const user = await this.userRepository.findOne(payload.userId);
+  async deserializeUser(payload: string, done: (err: Error | null, data?: any) => void): Promise<any> {
+    const user = await this.userRepository.findOne(payload);
     if (!user) {
       return done(new NotFoundException('User not found'));
     }

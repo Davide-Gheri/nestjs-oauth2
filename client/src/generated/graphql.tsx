@@ -72,6 +72,7 @@ export type User = {
   email: Scalars['EmailAddress'];
   emailVerifiedAt?: Maybe<Scalars['DateTime']>;
   role: Roles;
+  tfaEnabled: Scalars['Boolean'];
   picture: Scalars['String'];
 };
 
@@ -121,6 +122,9 @@ export type Mutation = {
   deleteUser: Scalars['Boolean'];
   deleteSession: Scalars['Boolean'];
   updateCurrentUser: User;
+  requestTfa: Scalars['String'];
+  verifyTfa: Scalars['Boolean'];
+  disableTfa: Scalars['Boolean'];
 };
 
 
@@ -163,6 +167,11 @@ export type MutationDeleteSessionArgs = {
 
 export type MutationUpdateCurrentUserArgs = {
   data: UpdateCurrentUserInput;
+};
+
+
+export type MutationVerifyTfaArgs = {
+  code: Scalars['String'];
 };
 
 export type CreateClientInput = {
@@ -224,7 +233,7 @@ export type ClientDataFragment = (
 
 export type UserDataFragment = (
   { __typename?: 'User' }
-  & Pick<User, 'id' | 'nickname' | 'firstName' | 'lastName' | 'email' | 'picture' | 'createdAt' | 'updatedAt' | 'emailVerifiedAt' | 'role'>
+  & Pick<User, 'id' | 'nickname' | 'firstName' | 'lastName' | 'email' | 'picture' | 'createdAt' | 'updatedAt' | 'emailVerifiedAt' | 'role' | 'tfaEnabled'>
 );
 
 export type SessionDataFragment = (
@@ -290,6 +299,32 @@ export type DeleteSessionMutationVariables = {
 export type DeleteSessionMutation = (
   { __typename?: 'Mutation' }
   & Pick<Mutation, 'deleteSession'>
+);
+
+export type RequestTfaMutationVariables = {};
+
+
+export type RequestTfaMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'requestTfa'>
+);
+
+export type VerifyTfaMutationVariables = {
+  code: Scalars['String'];
+};
+
+
+export type VerifyTfaMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'verifyTfa'>
+);
+
+export type DisableTfaMutationVariables = {};
+
+
+export type DisableTfaMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'disableTfa'>
 );
 
 export type CreateUserMutationVariables = {
@@ -428,6 +463,7 @@ export const UserDataFragmentDoc = gql`
   updatedAt
   emailVerifiedAt
   role
+  tfaEnabled
 }
     `;
 export const SessionDataFragmentDoc = gql`
@@ -481,6 +517,27 @@ export const DeleteSessionDocument = gql`
     `;
 export type DeleteSessionMutationResult = ApolloReactCommon.MutationResult<DeleteSessionMutation>;
 export type DeleteSessionMutationOptions = ApolloReactCommon.BaseMutationOptions<DeleteSessionMutation, DeleteSessionMutationVariables>;
+export const RequestTfaDocument = gql`
+    mutation RequestTfa {
+  requestTfa
+}
+    `;
+export type RequestTfaMutationResult = ApolloReactCommon.MutationResult<RequestTfaMutation>;
+export type RequestTfaMutationOptions = ApolloReactCommon.BaseMutationOptions<RequestTfaMutation, RequestTfaMutationVariables>;
+export const VerifyTfaDocument = gql`
+    mutation VerifyTfa($code: String!) {
+  verifyTfa(code: $code)
+}
+    `;
+export type VerifyTfaMutationResult = ApolloReactCommon.MutationResult<VerifyTfaMutation>;
+export type VerifyTfaMutationOptions = ApolloReactCommon.BaseMutationOptions<VerifyTfaMutation, VerifyTfaMutationVariables>;
+export const DisableTfaDocument = gql`
+    mutation DisableTfa {
+  disableTfa
+}
+    `;
+export type DisableTfaMutationResult = ApolloReactCommon.MutationResult<DisableTfaMutation>;
+export type DisableTfaMutationOptions = ApolloReactCommon.BaseMutationOptions<DisableTfaMutation, DisableTfaMutationVariables>;
 export const CreateUserDocument = gql`
     mutation CreateUser($data: CreateUserInput!) {
   createUser(data: $data) {

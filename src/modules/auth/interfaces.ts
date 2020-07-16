@@ -1,15 +1,6 @@
-import { User } from '@app/entities';
 
-export interface SessionPayload {
-  user: User;
-  info: {
-    ip: string;
-    userAgent?: string;
-  }
-}
-
-export interface SerializedSessionPayload {
-  userId: string;
+export interface SerializedPassportSessionPayload {
+  user: string;
   info: {
     ip: string;
     userAgent?: string;

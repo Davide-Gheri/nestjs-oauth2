@@ -1,45 +1,55 @@
 import { Controller, Req, UseGuards, Post, Body, Query, Res, Session, Get, Render } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { GuestGuard, LoginGuard } from '../guards';
+import { GuestGuard, LoginGuard, TfaGuard } from '../guards';
 import { LoginDto } from '../dtos';
-import { CurrentUser } from '../decorators';
-import { User } from '@app/entities';
+import { handleSuccessLogin } from '@app/modules/auth/utils';
+import { ConfigService } from '@nestjs/config';
 
 @UseGuards(GuestGuard)
 @Controller('auth')
 export class LoginController {
+  constructor(
+    private readonly config: ConfigService,
+  ) {}
+
   @UseGuards(LoginGuard)
   @Post('login')
   handleLogin(
     @Body() data: LoginDto,
-    @CurrentUser() user: User,
     @Session() session: any,
     @Query('redirect_uri') intended: string,
     @Res() res: Response,
     @Req() req: Request,
   ) {
-    if (data.remember) {
-      session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000;
-    } else {
-      session.cookie.expires = false;
-    }
+    return handleSuccessLogin(
+      req, res, intended, !!data.remember,
+    );
+  }
 
-    if (req.accepts('json')) {
-      return res.json({
-        returnTo: intended || '/',
-      });
-    }
-
-    res.redirect(intended || '/');
+  @UseGuards(TfaGuard)
+  @Post('tfa')
+  handle2Fa(
+    @Body() data: { remember: any },
+    @Session() session: any,
+    @Req() req: Request,
+    @Query('redirect_uri') intended: string,
+    @Res() res: Response,
+  ) {
+    return handleSuccessLogin(
+      req, res, intended, !!data.remember,
+    );
   }
 
   @Get('login')
   @Render('index')
   showLoginForm(
     @Req() req: Request,
+    @Query('redirect_uri') intended: string,
   ) {
     return {
       csrfToken: req.csrfToken(),
+      facebookLoginUrl: this.config.get('social.facebook.loginUrl')(encodeURIComponent(intended || '/')),
+      googleLoginUrl: this.config.get('social.google.loginUrl')(encodeURIComponent(intended || '/')),
     }
   }
 }

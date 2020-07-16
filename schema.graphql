@@ -58,9 +58,10 @@ type User {
   nickname: String!
   firstName: String
   lastName: String
-  email: EmailAddress!
+  email: EmailAddress
   emailVerifiedAt: DateTime
   role: Roles!
+  tfaEnabled: Boolean!
   picture: String!
 }
 
@@ -100,6 +101,9 @@ type Mutation {
   deleteUser(id: ID!): Boolean!
   deleteSession(id: ID!): Boolean!
   updateCurrentUser(data: UpdateCurrentUserInput!): User!
+  requestTfa: String!
+  verifyTfa(code: String!): Boolean!
+  disableTfa: Boolean!
 }
 
 input CreateClientInput {

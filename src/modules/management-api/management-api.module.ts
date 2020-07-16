@@ -9,7 +9,7 @@ import { AccessControlModule } from 'nest-access-control';
 import { roles } from '@app/modules/auth';
 import { APP_FILTER } from '@nestjs/core';
 import { GraphqlFilter } from '@app/modules/management-api/filters';
-import { SessionService } from '@app/modules/management-api/services';
+import { SessionService, TfaService } from '@app/modules/management-api/services';
 import { UserModule } from '@app/modules/user';
 
 @Module({
@@ -28,6 +28,7 @@ import { UserModule } from '@app/modules/user';
   ],
   providers: [
     SessionService,
+    TfaService,
     ClientResolver,
     UserResolver,
     CurrentUserResolver,
