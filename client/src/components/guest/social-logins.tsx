@@ -4,6 +4,7 @@ import { Facebook } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
 import { ReactComponent as GoogleLogo } from '../../assets/google-logo.svg';
+import { useAppData } from '../../hooks';
 
 const useStyles = makeStyles(theme => ({
   button: {
@@ -34,6 +35,7 @@ const useStyles = makeStyles(theme => ({
 
 export const SocialLogins: React.FC = () => {
   const classes = useStyles();
+  const { facebookLoginUrl, googleLoginUrl } = useAppData();
 
   return (
     <>
@@ -43,7 +45,7 @@ export const SocialLogins: React.FC = () => {
         className={clsx(classes.button, classes.fbButton)}
         startIcon={<Facebook/>}
         onClick={() => {
-          window.location.href = window.__APP_DATA__.facebookLoginUrl;
+          window.location.href = facebookLoginUrl;
         }}
       >
         Login with Facebook
@@ -59,7 +61,7 @@ export const SocialLogins: React.FC = () => {
           </SvgIcon>
         }
         onClick={() => {
-          window.location.href = window.__APP_DATA__.googleLoginUrl;
+          window.location.href = googleLoginUrl;
         }}
       >
         Login with Google

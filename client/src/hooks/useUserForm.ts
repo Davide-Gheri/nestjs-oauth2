@@ -36,13 +36,16 @@ export const useUserNewForm = () => {
         const users = cache.readQuery<GetUsersQuery>({ query: GetUsersDocument });
         if (users?.getUsers && mutationResult.data) {
           const newUsers = [
-            ...users.getUsers,
+            ...users.getUsers.items,
             mutationResult.data.createUser,
           ];
           cache.writeQuery<GetUsersQuery>({
             query: GetUsersDocument,
             data: {
-              getUsers: newUsers,
+              getUsers: {
+                items: newUsers,
+                paginationInfo: users.getUsers.paginationInfo,
+              },
             },
           });
         }
@@ -133,12 +136,15 @@ export const useDeleteUser = (id: string) => {
         const clients = cache.readQuery<GetUsersQuery>({ query: GetUsersDocument });
         if (clients?.getUsers && mutationResult.data) {
           const newUsers = [
-            ...clients.getUsers.filter(u => u.id !== id),
+            ...clients.getUsers.items.filter(u => u.id !== id),
           ];
           cache.writeQuery<GetUsersQuery>({
             query: GetUsersDocument,
             data: {
-              getUsers: newUsers,
+              getUsers: {
+                items: newUsers,
+                paginationInfo: clients.getUsers.paginationInfo,
+              },
             },
           });
         }

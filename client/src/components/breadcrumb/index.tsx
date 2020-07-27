@@ -27,7 +27,7 @@ export const Breadcrumb = memo(() => {
       }
     });
 
-    setCrumbs(crumbs);
+    setCrumbs(crumbs.length > 1 ? crumbs : []);
 
   }, [location]);
 

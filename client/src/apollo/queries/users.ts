@@ -1,9 +1,18 @@
 import { gql } from '@apollo/client';
 
 gql`
-  query GetUsers {
-      getUsers {
-          ...UserData
+  query GetUsers(
+      $skip: Int!
+      $limit: Int!
+  ) {
+      getUsers(skip: $skip, limit: $limit) {
+          items {
+              ...UserData
+          }
+          paginationInfo {
+              total
+              hasMore
+          }
       }
   }
 `;

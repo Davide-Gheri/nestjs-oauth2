@@ -52,7 +52,7 @@ export enum ResponseTypes {
 export enum ResponseModes {
   Query = 'query',
   Fragment = 'fragment',
-  FormPort = 'form_port'
+  FormPost = 'form_post'
 }
 
 export enum TokenAuthMethod {
@@ -69,7 +69,7 @@ export type User = {
   nickname: Scalars['String'];
   firstName?: Maybe<Scalars['String']>;
   lastName?: Maybe<Scalars['String']>;
-  email: Scalars['EmailAddress'];
+  email?: Maybe<Scalars['EmailAddress']>;
   emailVerifiedAt?: Maybe<Scalars['DateTime']>;
   role: Roles;
   tfaEnabled: Scalars['Boolean'];
@@ -81,6 +81,18 @@ export enum Roles {
   Admin = 'ADMIN',
   User = 'USER'
 }
+
+export type PaginationInfo = {
+  __typename?: 'PaginationInfo';
+  hasMore: Scalars['Boolean'];
+  total: Scalars['Int'];
+};
+
+export type UsersPaginatedResponse = {
+  __typename?: 'UsersPaginatedResponse';
+  items: Array<User>;
+  paginationInfo: PaginationInfo;
+};
 
 export type Session = {
   __typename?: 'Session';
@@ -95,11 +107,14 @@ export type Session = {
 export type Query = {
   __typename?: 'Query';
   activeSessions: Array<Session>;
+  clientsCount: Scalars['Int'];
   getClient: OAuthClient;
   getClients: Array<OAuthClient>;
   getCurrentUser?: Maybe<User>;
   getUser: User;
-  getUsers: Array<User>;
+  getUsers: UsersPaginatedResponse;
+  newSignUps: Scalars['Int'];
+  usersCount: Scalars['Int'];
 };
 
 
@@ -110,6 +125,17 @@ export type QueryGetClientArgs = {
 
 export type QueryGetUserArgs = {
   id: Scalars['ID'];
+};
+
+
+export type QueryGetUsersArgs = {
+  limit?: Maybe<Scalars['Int']>;
+  skip?: Maybe<Scalars['Int']>;
+};
+
+
+export type QueryNewSignUpsArgs = {
+  since: Scalars['DateTime'];
 };
 
 export type Mutation = {
@@ -410,15 +436,41 @@ export type GetActiveSessionsQuery = (
   )> }
 );
 
-export type GetUsersQueryVariables = {};
+export type GetDashboardInfoQueryVariables = {
+  since: Scalars['DateTime'];
+};
+
+
+export type GetDashboardInfoQuery = (
+  { __typename?: 'Query' }
+  & Pick<Query, 'clientsCount' | 'usersCount' | 'newSignUps'>
+  & { getUsers: (
+    { __typename?: 'UsersPaginatedResponse' }
+    & { items: Array<(
+      { __typename?: 'User' }
+      & UserDataFragment
+    )> }
+  ) }
+);
+
+export type GetUsersQueryVariables = {
+  skip: Scalars['Int'];
+  limit: Scalars['Int'];
+};
 
 
 export type GetUsersQuery = (
   { __typename?: 'Query' }
-  & { getUsers: Array<(
-    { __typename?: 'User' }
-    & UserDataFragment
-  )> }
+  & { getUsers: (
+    { __typename?: 'UsersPaginatedResponse' }
+    & { items: Array<(
+      { __typename?: 'User' }
+      & UserDataFragment
+    )>, paginationInfo: (
+      { __typename?: 'PaginationInfo' }
+      & Pick<PaginationInfo, 'total' | 'hasMore'>
+    ) }
+  ) }
 );
 
 export type GetUserQueryVariables = {
@@ -595,10 +647,29 @@ export const GetActiveSessionsDocument = gql`
 }
     ${SessionDataFragmentDoc}`;
 export type GetActiveSessionsQueryResult = ApolloReactCommon.QueryResult<GetActiveSessionsQuery, GetActiveSessionsQueryVariables>;
+export const GetDashboardInfoDocument = gql`
+    query GetDashboardInfo($since: DateTime!) {
+  clientsCount
+  usersCount
+  newSignUps(since: $since)
+  getUsers(limit: 5) {
+    items {
+      ...UserData
+    }
+  }
+}
+    ${UserDataFragmentDoc}`;
+export type GetDashboardInfoQueryResult = ApolloReactCommon.QueryResult<GetDashboardInfoQuery, GetDashboardInfoQueryVariables>;
 export const GetUsersDocument = gql`
-    query GetUsers {
-  getUsers {
-    ...UserData
+    query GetUsers($skip: Int!, $limit: Int!) {
+  getUsers(skip: $skip, limit: $limit) {
+    items {
+      ...UserData
+    }
+    paginationInfo {
+      total
+      hasMore
+    }
   }
 }
     ${UserDataFragmentDoc}`;

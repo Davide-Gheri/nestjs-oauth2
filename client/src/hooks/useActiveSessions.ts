@@ -8,11 +8,13 @@ import {
 import { dummySessions } from '../utils/dummy';
 import { useCallback } from 'react';
 import { useSnackbar } from 'notistack';
+import { useAppData } from './useAppdata';
 
 export const useActiveSessions = () => {
   const { enqueueSnackbar } = useSnackbar();
   const { data, loading } = useQuery<GetActiveSessionsQuery>(GetActiveSessionsDocument);
   const [mutate] = useMutation<DeleteSessionMutation, DeleteSessionMutationVariables>(DeleteSessionDocument);
+  const { currentSession } = useAppData();
 
   const deleteSession = useCallback(async (id: string) => {
     try {
@@ -49,8 +51,6 @@ export const useActiveSessions = () => {
       });
     }
   }, [mutate]);
-
-  const currentSession = process.env.NODE_ENV === 'development' ? dummySessions[0].sessionId : window.__APP_DATA__.currentSession;
 
   return {
     sessions: data?.activeSessions,

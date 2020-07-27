@@ -152,7 +152,7 @@ export const useClientNewForm = () => {
   const onSubmit = useCallback((data: ClientNewForm) => {
     if (!data.redirect || !data.redirect.length) {
       setError('redirect', 'required', 'Redirect URIs required');
-      return;
+      throw new Error();
     }
     (async () => {
       try {

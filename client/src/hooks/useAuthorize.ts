@@ -1,6 +1,7 @@
+import { useAppData } from './useAppdata';
 
 export const useAuthorize = () => {
-  const { client, scopes } = window.__APP_DATA__;
+  const { client, scopes } = useAppData();
 
   return {
     client,
