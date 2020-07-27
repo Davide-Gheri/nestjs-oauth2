@@ -1,4 +1,4 @@
-import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, ID, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { User } from '@app/entities';
 import { CreateUserInput, UpdateUserInput } from '../inputs';
 import { ApolloError, UserInputError } from 'apollo-server-errors';
@@ -7,6 +7,7 @@ import { AcGuard, AuthGuard } from '@app/modules/management-api/guards';
 import { UseRoles } from 'nest-access-control';
 import { UserService } from '@app/modules/user';
 import { HttpExceptionFilter } from '@app/modules/management-api/filters';
+import { UsersPaginatedResponse } from '@app/modules/management-api/types/users-paginated.response';
 
 @UseFilters(HttpExceptionFilter)
 @UseGuards(AuthGuard)
@@ -22,11 +23,24 @@ export class UserResolver {
     possession: 'any',
     action: 'read',
   })
-  @Query(returns => [User])
-  getUsers() {
-    return this.userService.repository.find({
-      order: { createdAt: 'ASC' },
+  @Query(returns => UsersPaginatedResponse)
+  async getUsers(
+    @Args({ name: 'skip', type: () => Int, defaultValue: 0 }) skip: number,
+    @Args({ name: 'limit', type: () => Int, defaultValue: 10 }) limit: number,
+  ) {
+    const [items, total] = await this.userService.repository.findAndCount({
+      order: { createdAt: 'DESC' },
+      skip,
+      take: limit,
     });
+
+    return {
+      items,
+      paginationInfo: {
+        hasMore: (skip + limit) < total,
+        total,
+      }
+    }
   }
 
   @UseGuards(AcGuard)
