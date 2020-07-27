@@ -48,8 +48,14 @@ export class LoginController {
   ) {
     return {
       csrfToken: req.csrfToken(),
-      facebookLoginUrl: this.config.get('social.facebook.loginUrl')(encodeURIComponent(intended || '/')),
-      googleLoginUrl: this.config.get('social.google.loginUrl')(encodeURIComponent(intended || '/')),
+      facebookLoginUrl: this.config.get('social.facebook.loginUrl')(
+        encodeURIComponent(intended || '/'),
+        this.config.get('app.appUrl'),
+      ),
+      googleLoginUrl: this.config.get('social.google.loginUrl')(
+        encodeURIComponent(intended || '/'),
+        this.config.get('app.appUrl'),
+      ),
     }
   }
 }

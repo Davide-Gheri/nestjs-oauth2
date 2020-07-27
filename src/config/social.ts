@@ -6,10 +6,10 @@ export const social = registerAs('social', () => ({
     id: process.env.FACEBOOK_ID,
     secret: process.env.FACEBOOK_SECRET,
     graphUrl: 'https://graph.facebook.com/v7.0/',
-    loginUrl: (state: string) => {
+    loginUrl: (state: string, appUrl: string) => {
       const stringifiedParams = querystring.stringify({
         client_id: process.env.FACEBOOK_ID,
-        redirect_uri: 'http://localhost:4000/auth/social/facebook',
+        redirect_uri: `${appUrl}/auth/social/facebook`,
         scope: ['email', 'public_profile'].join(','),
         response_type: 'code',
         state,
@@ -21,10 +21,10 @@ export const social = registerAs('social', () => ({
     id: process.env.GOOGLE_ID,
     secret: process.env.GOOGLE_SECRET,
     tokenUrl: 'https://oauth2.googleapis.com/token',
-    loginUrl: (state: string) => {
+    loginUrl: (state: string, appUrl: string) => {
       const stringifiedParams = querystring.stringify({
         client_id: process.env.GOOGLE_ID,
-        redirect_uri: 'http://localhost:4000/auth/social/google',
+        redirect_uri: `${appUrl}/auth/social/google`,
         scope: ['email', 'profile', 'openid'].join(' '),
         response_type: 'code',
         state,
