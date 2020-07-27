@@ -22,7 +22,7 @@ export const grantsWithIdToken = [
 export enum ResponseModes {
   query = 'query',
   fragment = 'fragment',
-  form_port = 'form_post',
+  form_post = 'form_post',
 }
 
 export enum ResponseTypes {

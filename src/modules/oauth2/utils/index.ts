@@ -25,7 +25,7 @@ export const handleResponseMode = (
       return res.status(302).redirect(this.makeRedirectUri(returnTo, params));
     case ResponseModes.fragment:
       return res.status(302).redirect(this.makeRedirectUri(returnTo, undefined, params));
-    case ResponseModes.form_port:
+    case ResponseModes.form_post:
       return res.render('form_post', {
         returnTo,
         hiddenFields: params,
