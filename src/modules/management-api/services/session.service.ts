@@ -46,9 +46,7 @@ export class SessionService {
     sessionId: string,
   ) {
     const userSessions = await this.getUserSessions(user, req);
-    const toDelete = userSessions.find(s => s.sessionId === sessionId);
-
-    return toDelete;
+    return  userSessions.find(s => s.sessionId === sessionId);
   }
 
   async deleteUserSession(

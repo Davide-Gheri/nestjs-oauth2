@@ -42,7 +42,7 @@ enum ResponseTypes {
 enum ResponseModes {
   query
   fragment
-  form_port
+  form_post
 }
 
 enum TokenAuthMethod {
@@ -75,6 +75,16 @@ enum Roles {
   USER
 }
 
+type PaginationInfo {
+  hasMore: Boolean!
+  total: Int!
+}
+
+type UsersPaginatedResponse {
+  items: [User!]!
+  paginationInfo: PaginationInfo!
+}
+
 type Session {
   sessionId: ID!
   ip: String!
@@ -87,9 +97,12 @@ type Session {
 type Query {
   getClients: [OAuthClient!]!
   getClient(id: ID!): OAuthClient!
-  getUsers: [User!]!
+  getUsers(limit: Int = 10, skip: Int = 0): UsersPaginatedResponse!
   getUser(id: ID!): User!
   activeSessions: [Session!]!
+  usersCount: Int!
+  clientsCount: Int!
+  newSignUps(since: DateTime!): Int!
 }
 
 type Mutation {

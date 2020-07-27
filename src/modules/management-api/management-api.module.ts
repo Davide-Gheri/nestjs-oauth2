@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { OAuthClient } from '@app/entities';
+import { OAuthClient, User } from '@app/entities';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { ClientResolver, CurrentUserResolver, UserResolver } from './resolvers';
+import { ClientResolver, CurrentUserResolver, DashboardResolver, UserResolver } from './resolvers';
 import { GraphqlFactory } from './graphql.factory';
 import { AccessControlModule } from 'nest-access-control';
 import { roles } from '@app/modules/auth';
@@ -18,7 +18,7 @@ import { UserModule } from '@app/modules/user';
     UserModule,
     AccessControlModule.forRoles(roles),
     TypeOrmModule.forFeature([
-      OAuthClient,
+      OAuthClient, User,
     ]),
     GraphQLModule.forRootAsync({
       imports: [ConfigModule],
@@ -32,6 +32,7 @@ import { UserModule } from '@app/modules/user';
     ClientResolver,
     UserResolver,
     CurrentUserResolver,
+    DashboardResolver,
     {
       provide: APP_FILTER,
       useClass: GraphqlFilter,
