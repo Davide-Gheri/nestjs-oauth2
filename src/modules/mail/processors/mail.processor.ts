@@ -38,15 +38,15 @@ export class MailProcessor {
    * @param job
    */
   @Process('user-welcome')
-  sendInviteOperatorMail(job: Job<{ user: User, idHash: string; emailHash: string }>) {
-    const uri = `email/confirm/${job.data.idHash}/${job.data.emailHash}`;
+  sendInviteUserMail(job: Job<{ user: User, idHash: string; emailHash: string }>) {
+    const uri = `/email/confirm/${job.data.idHash}/${job.data.emailHash}`;
     return this.mailService.sendMail({
       template: 'welcome',
       context: {
         ...plainToClass(User, job.data.user),
         link: this.urlSignService.sign(`${this.config.get('app.appUrl')}${uri}`),
       },
-      subject: `Welcome to Argo services`,
+      subject: `Welcome to ${this.config.get('app.appName')}`,
       to: job.data.user.email,
     });
   }
