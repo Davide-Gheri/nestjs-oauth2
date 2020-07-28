@@ -6,6 +6,7 @@ export const useAppData = (): typeof window.__APP_DATA__ => {
       user: dummyUser,
       currentSession: dummySessions[0].sessionId,
       grants: dummyGrants,
+      appName: 'App name',
     } as typeof window.__APP_DATA__;
   }
   return window.__APP_DATA__;

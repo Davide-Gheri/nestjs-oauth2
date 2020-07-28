@@ -28,7 +28,7 @@ const DashboardPage: React.FC<RouteComponentProps> = () => {
             startIcon={<Add/>}
             onClick={() => setOpen(true)}
           >
-            Create new
+            Create new Client
           </Button>
         )}
       </Box>

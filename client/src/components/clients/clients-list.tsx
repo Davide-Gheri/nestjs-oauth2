@@ -43,7 +43,7 @@ export const ClientsList: React.FC = () => {
             </ListItem>
           ))
         ) : (
-          clients.map((client, idx) => (
+          clients.length ? clients.map((client, idx) => (
             <ListItem
               key={client.id}
               divider={idx !== clients.length -1 }
@@ -60,7 +60,15 @@ export const ClientsList: React.FC = () => {
                 </IconButton>
               </ListItemSecondaryAction>
             </ListItem>
-            ))
+            )) : (
+              <ListItem
+                className={classes.listItem}
+              >
+                <ListItemText
+                  primary="No clients found"
+                />
+              </ListItem>
+          )
         )}
       </List>
     </Box>

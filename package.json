@@ -37,7 +37,7 @@
     "bull": "^3.14.0",
     "class-transformer": "^0.2.3",
     "class-validator": "^0.12.2",
-    "commander": "5.1.0",
+    "commander": "^6.0.0",
     "connect-redis": "^4.0.4",
     "cookie-parser": "^1.4.5",
     "csurf": "^1.11.0",

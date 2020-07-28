@@ -3,7 +3,7 @@ import { AppBar, Toolbar, Typography, IconButton, Box, Button, Avatar, Menu, Men
 import { Menu as MenuIcon } from '@material-ui/icons';
 import { useNavigationStyles } from './styles';
 import HiddenCss from '@material-ui/core/Hidden/HiddenCss';
-import { useAppCurrentUser, useCsrf } from '../../hooks';
+import { useAppCurrentUser, useAppData, useCsrf } from '../../hooks';
 import { UserProfile } from './user-profile';
 import { Link } from 'react-router-dom';
 
@@ -16,6 +16,7 @@ export const NavBar: React.FC<NavBarProps> = ({ onMobileDrawerToggle, hasSidebar
   const classes = useNavigationStyles();
   const csrf = useCsrf();
   const user = useAppCurrentUser();
+  const { appName } = useAppData();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const formRef = useRef<null | HTMLFormElement>(null);
 
@@ -56,7 +57,7 @@ export const NavBar: React.FC<NavBarProps> = ({ onMobileDrawerToggle, hasSidebar
           </HiddenCss>
         )}
         <Typography variant="h6" noWrap color="inherit">
-          App name - Management
+          {appName} - Management
         </Typography>
         <Box ml="auto">
           <Box ml={2}>
