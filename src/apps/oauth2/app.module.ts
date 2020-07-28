@@ -2,7 +2,7 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import * as configs from './config';
+import * as configs from '@config';
 import * as entities from './entities';
 import { RedisModule } from '@app/lib/redis';
 import { AuthModule, roles } from './modules/auth';

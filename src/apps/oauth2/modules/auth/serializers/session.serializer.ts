@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PassportSerializer } from '@nestjs/passport';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -34,7 +34,7 @@ export class SessionSerializer extends PassportSerializer {
   async deserializeUser(payload: string, done: (err: Error | null, data?: any) => void): Promise<any> {
     const user = await this.userRepository.findOne(payload);
     if (!user) {
-      return done(new NotFoundException('User not found'));
+      return done(new ForbiddenException('User not found'));
     }
     done(null, plainToClass(User, user));
   }

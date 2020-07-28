@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import * as configs from '@app/config';
+import * as configs from '@config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as entities from '@app/entities';
 import { ConsoleModule } from 'nestjs-console';
-import { KeysService } from '@app/modules/cli/services';
+import { KeysService } from './services';
 import { CipherModule } from '@app/lib/cipher';
 
 @Module({

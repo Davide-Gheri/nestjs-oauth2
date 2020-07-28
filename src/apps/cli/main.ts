@@ -1,7 +1,8 @@
 import { BootstrapConsole } from 'nestjs-console';
+import { Command } from 'commander';
 import { CliModule } from './modules/cli/cli.module';
 
-async function bootstrap() {
+export default async function bootstrap(command: Command) {
   const boot = new BootstrapConsole({
     module: CliModule,
     useDecorators: true,
@@ -12,7 +13,7 @@ async function bootstrap() {
   boot.init().then(async app => {
     try {
       await app.init();
-      await boot.boot(process.argv);
+      await boot.boot(command.args);
       process.exit(0);
     } catch (e) {
       // tslint:disable-next-line:no-console
@@ -21,4 +22,3 @@ async function bootstrap() {
     }
   });
 }
-bootstrap();

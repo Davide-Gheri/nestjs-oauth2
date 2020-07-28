@@ -28,6 +28,7 @@ export class AppController {
       currentSession: req.session?.id,
       facebookLoginUrl: this.config.get('social.facebook.loginUrl')(encodeURIComponent('/')),
       googleLoginUrl: this.config.get('social.google.loginUrl')(encodeURIComponent('/')),
+      appName: this.config.get('app.appName'),
     }
   }
 
