@@ -1,3 +1,18 @@
+FROM node:lts-alpine as clientBuilder
+
+COPY client/package.json .
+COPY client/yarn.lock .
+
+COPY client/tsconfig.json .
+
+COPY client/views views
+COPY client/public public
+COPY client/src src
+
+RUN yarn install
+
+RUN yarn build
+
 FROM node:lts-alpine as builder
 
 RUN apk add python make g++
@@ -22,13 +37,8 @@ FROM node:lts-alpine as prod
 
 WORKDIR /app
 
-COPY client/build client/build
-COPY client/views client/views
-
 COPY --from=builder package.json .
 COPY --from=builder yarn.lock .
-
-COPY --from=builder dist dist
 
 ENV NODE_ENV=production
 
@@ -37,6 +47,11 @@ RUN yarn install --prod --frozen-lockfile --ignore-optional && \
     yarn cache clean
 
 COPY ormconfig.js .
+
+COPY --from=builder dist dist
+
+COPY --from=clientBuilder build client/build
+COPY --from=clientBuilder views client/views
 
 ENV PATH /app/node_modules/.bin:$PATH
 
