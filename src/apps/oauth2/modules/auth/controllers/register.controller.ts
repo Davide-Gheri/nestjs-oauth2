@@ -21,13 +21,7 @@ export class RegisterController {
   ) {
     const user = await this.registerService.register(data);
 
-    await new Promise((resolve, reject) => req.login({
-      user,
-      info: {
-        ip: req.ip,
-        userAgent: req.headers['user-agent'],
-      },
-    }, err => {
+    await new Promise((resolve, reject) => req.login(user, err => {
       if (err) {
         return reject(err);
       }
