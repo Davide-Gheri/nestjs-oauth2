@@ -8,3 +8,4 @@ export * from './cert';
 export * from './mail';
 export * from './management';
 export * from './social';
+export * from './rateLimit';
