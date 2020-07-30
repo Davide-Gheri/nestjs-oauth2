@@ -27,7 +27,6 @@ COPY tsconfig.json .
 COPY tsconfig.build.json .
 
 COPY src src
-COPY views views
 
 ENV NODE_ENV=production
 
@@ -53,10 +52,12 @@ COPY --from=builder dist dist
 COPY --from=clientBuilder build client/build
 COPY --from=clientBuilder views client/views
 
+COPY views views
+
 ENV PATH /app/node_modules/.bin:$PATH
 
 EXPOSE 5000
 
 ENTRYPOINT ["node", "dist/main.js"]
 
-CMD "serve"
+CMD ["serve"]

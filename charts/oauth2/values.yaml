@@ -9,7 +9,8 @@ image:
   tag: latest
   pullPolicy: IfNotPresent
 
-imagePullSecrets: []
+imagePullSecrets:
+  - name: gcr-json-key
 nameOverride: ""
 fullnameOverride: ""
 
@@ -67,3 +68,27 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+database:
+  host: "rogue.db.elephantsql.com"
+  port: "5432"
+  name: "lelqzoje"
+  username: "lelqzoje"
+  password: "PIRRPwFQNPV7Zo4FZ5KIhZB8gdDnVksF"
+
+redis:
+  host: "localhost"
+  port: "6379"
+
+facebook:
+  id: "fbid"
+  secret: "fbsecret"
+google:
+  id: "gooid"
+  secret: "goosecret"
+
+crypto:
+  iv: "iv1234"
+  secret: "secret1234"
+
+secrets: {}
