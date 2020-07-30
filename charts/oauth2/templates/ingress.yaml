@@ -1,41 +1,28 @@
 {{- if .Values.ingress.enabled -}}
-{{- $fullName := include "oauth2.fullname" . -}}
-{{- $svcPort := .Values.service.port -}}
-{{- if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
-apiVersion: networking.k8s.io/v1beta1
-{{- else -}}
-apiVersion: extensions/v1beta1
-{{- end }}
-kind: Ingress
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
 metadata:
-  name: {{ $fullName }}
+  name: {{ include "oauth2.fullname" . }}
+  annotations:
+    helm.sh/hook: "post-install,post-upgrade"
+    {{- with .Values.ingress.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
   labels:
     {{- include "oauth2.labels" . | nindent 4 }}
-  {{- with .Values.ingress.annotations }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
 spec:
-{{- if .Values.ingress.tls }}
-  tls:
-  {{- range .Values.ingress.tls }}
-    - hosts:
-      {{- range .hosts }}
-        - {{ . | quote }}
-      {{- end }}
-      secretName: {{ .secretName }}
-  {{- end }}
-{{- end }}
-  rules:
-  {{- range .Values.ingress.hosts }}
-    - host: {{ .host | quote }}
-      http:
-        paths:
-        {{- range .paths }}
-          - path: {{ . }}
-            backend:
-              serviceName: {{ $fullName }}
-              servicePort: {{ $svcPort }}
-        {{- end }}
-  {{- end }}
-{{- end }}
+  entryPoints:
+    - web
+  routes:
+    - match: {{ .Values.ingress.match }}
+      kind: Rule
+      services:
+        - kind: Service
+          name: {{ include "oauth2.fullname" . }}
+          passHostHeader: true
+          port: 80
+          responseForwarding:
+            flushInterval: 1ms
+          strategy: RoundRobin
+          weight: 10
+  {{- end -}}
