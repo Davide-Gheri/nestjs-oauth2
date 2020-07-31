@@ -49,6 +49,9 @@ export class AppModule implements NestModule {
     consumer.apply(csurf({ cookie: true }))
     .exclude(
       'oauth2/token',
+      'oauth2/introspect',
+      'oauth2/revoke',
+      'oauth2/userinfo',
       'debug/(.*)',
       'api/graphql',
     )

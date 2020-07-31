@@ -13,7 +13,7 @@ export default async function bootstrap(command: Command) {
   boot.init().then(async app => {
     try {
       await app.init();
-      await boot.boot(command.args);
+      await boot.boot(['', '', ...command.args]);
       process.exit(0);
     } catch (e) {
       // tslint:disable-next-line:no-console
