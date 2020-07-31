@@ -81,7 +81,6 @@ export class TokenService extends OAuthService {
     let decoded: AccessTokenJwtPayload | RefreshTokenData;
     try {
       decoded = await this.tokenStrategy.verify(encrypted);
-      console.log('decoded jwt: ', decoded);
     } catch (e) {
       // It could be a Refresh Token, try to decrypt it
       decoded = this.decryptCipher(encrypted);
@@ -89,8 +88,6 @@ export class TokenService extends OAuthService {
         hint = TokenType.refresh_token;
       }
     }
-
-    console.log('decoded token:', decoded);
 
     // Invalid token
     if (!decoded) {
@@ -147,9 +144,6 @@ export class TokenService extends OAuthService {
    */
   public async verifyToken(encrypted: string, hint?: TokenType) {
     const { isAccessToken, decoded, token } = await this.decryptToken(encrypted, hint);
-
-    console.log('decrypted: ', token);
-
     if (!decoded) {
       return {
         active: false,
