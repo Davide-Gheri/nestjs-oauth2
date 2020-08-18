@@ -13,6 +13,7 @@ import { MailModule } from '@app/modules/mail';
 import csurf from "csurf";
 import { ManagementApiModule } from '@app/modules/management-api';
 import { AccessControlModule } from 'nest-access-control';
+import { UserApiModule } from '@app/modules/user-api/user-api.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { AccessControlModule } from 'nest-access-control';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
+
         return {
           ...config.get('db'),
           entities: Object.values(entities),
@@ -41,6 +43,7 @@ import { AccessControlModule } from 'nest-access-control';
     OpenIdModule,
     UserModule,
     ManagementApiModule,
+    UserApiModule,
   ],
   controllers: [AppController],
 })

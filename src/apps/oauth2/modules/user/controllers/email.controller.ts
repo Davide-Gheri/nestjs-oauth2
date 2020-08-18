@@ -1,4 +1,4 @@
-import { Controller, Get, HttpCode, HttpStatus, Param, Redirect, UseFilters, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Redirect, UseFilters, UseGuards } from '@nestjs/common';
 import { SignedGuard } from '@app/lib/sign';
 import { AuthenticatedGuard } from '@app/modules/auth/guards';
 import { ForbiddenExceptionFilter } from '@app/modules/auth/filters';

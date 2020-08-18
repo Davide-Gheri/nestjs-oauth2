@@ -6,7 +6,7 @@ import { RegisterService, UserService } from '@app/modules/user/services';
 import { MailModule } from '@app/modules/mail';
 import { TestController } from '@app/modules/user/test.controller';
 import { SignModule } from '@app/lib/sign';
-import { EmailController, UserController } from '@app/modules/user/controllers';
+import { EmailController } from '@app/modules/user/controllers';
 import { CipherModule } from '@app/lib/cipher';
 import { PasswordService } from '@app/modules/user/services/password.service';
 
@@ -33,7 +33,6 @@ import { PasswordService } from '@app/modules/user/services/password.service';
   controllers: [
     TestController,
     EmailController,
-    UserController,
   ],
   exports: [
     UserService,

@@ -4,7 +4,7 @@ import { Request } from 'express';
 import { TokenDto } from '@app/modules/oauth2/dto';
 import { AccessTokenRequestResponse } from '@app/modules/oauth2/interfaces';
 import { OAuthException } from '@app/modules/oauth2/errors';
-import { OAuthAccessToken, OAuthRefreshToken } from '@app/entities';
+import { OAuthAccessToken, OAuthRefreshToken, User } from '@app/entities';
 
 @InjectableGrant(GrantTypes.refresh_token)
 export class RefreshTokenServiceGrant extends AbstractGrant {
@@ -29,6 +29,7 @@ export class RefreshTokenServiceGrant extends AbstractGrant {
     return this.connection.transaction(async em => {
       const accessTokenRepo = em.getRepository(OAuthAccessToken);
       const refreshTokenRepo = em.getRepository(OAuthRefreshToken);
+      const userRepo = em.getRepository(User);
 
       const accessToken = await this.issueAccessToken(client, oldAccessToken.userId, scopes, accessTokenRepo);
       const refreshToken = await this.issueRefreshToken(accessToken, oldRefreshToken.expiresAt, refreshTokenRepo);
@@ -39,7 +40,7 @@ export class RefreshTokenServiceGrant extends AbstractGrant {
       return {
         accessToken,
         refreshToken,
-        user: await accessToken.user,
+        user: await userRepo.findOne(accessToken.userId),
       }
     });
   }

@@ -78,7 +78,7 @@ export abstract class AbstractGrant implements GrantInterface {
   }
 
   protected validateScope(client: OAuthClient, scopes: string[] = []) {
-    scopes.filter(s => s.split(':').length < 2).forEach(plainScope => {
+    scopes./*filter(s => s.split(':').length < 2).*/forEach(plainScope => {
       if (!client.canIssueScope(plainScope)) {
         this.logger.warn(`Client ${client.id} cannot issue scope ${plainScope}`);
         throw OAuthException.invalidScope(plainScope);

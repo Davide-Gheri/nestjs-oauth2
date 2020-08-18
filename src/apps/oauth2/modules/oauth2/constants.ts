@@ -47,6 +47,11 @@ export enum Scopes {
   offline_access = 'offline_access',
 }
 
+export enum ApiScopes {
+  users_profile = 'users:profile',
+  users_email = 'users:email',
+}
+
 export enum TokenAuthMethod {
   client_secret_post = 'client_secret_post',
   client_secret_basic = 'client_secret_basic',

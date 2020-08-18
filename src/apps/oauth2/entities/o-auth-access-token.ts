@@ -36,7 +36,7 @@ export class OAuthAccessToken extends BaseToken {
       aud: this.clientId,
       jti: this.id,
       exp: toEpochSeconds(this.expiresAt),
-      sub: this.userId,
+      sub: this.userId ? `${this.userId}@users` : `${this.clientId}@clients`,
       scopes: this.scopes,
     };
   }

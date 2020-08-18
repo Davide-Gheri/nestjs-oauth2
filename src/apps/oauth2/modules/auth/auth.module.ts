@@ -1,11 +1,11 @@
 import { forwardRef, HttpModule, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from '@app/entities';
+import { OAuthClient, User } from '@app/entities';
 import { SessionSerializer } from './serializers';
 import { PassportModule } from '@nestjs/passport';
 import { LoginController, LogoutController, RegisterController, SocialController } from './controllers';
-import { AuthenticatedGuard, GuestGuard, JwtGuard, LoginGuard, TfaGuard } from './guards';
+import { AuthenticatedGuard, GuestGuard, JwtGuard, LoginGuard, ScopeGuard, TfaGuard } from './guards';
 import { GuestExceptionFilter } from './filters';
 import { APP_FILTER } from '@nestjs/core';
 import { FacebookStrategy, GoogleStrategy, JwtStrategy, LocalStrategy, TfaStrategy } from './strategies';
@@ -17,7 +17,7 @@ import { TfaExceptionFilter } from '@app/modules/auth/filters/tfa-exception.filt
   imports: [
     ConfigModule,
     HttpModule,
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, OAuthClient]),
     PassportModule.register({
       session: true,
       defaultStrategy: 'local',
@@ -37,6 +37,7 @@ import { TfaExceptionFilter } from '@app/modules/auth/filters/tfa-exception.filt
     GuestGuard,
     JwtGuard,
     TfaGuard,
+    ScopeGuard,
     {
       provide: APP_FILTER,
       useClass: GuestExceptionFilter,
@@ -56,6 +57,7 @@ import { TfaExceptionFilter } from '@app/modules/auth/filters/tfa-exception.filt
     GuestGuard,
     LoginGuard,
     AuthenticatedGuard,
+    ScopeGuard,
   ]
 })
 export class AuthModule implements NestModule {

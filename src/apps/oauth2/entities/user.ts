@@ -4,7 +4,7 @@ import { Exclude, Expose } from 'class-transformer';
 import { OAuthAccessToken } from './o-auth-access-token';
 import { hashValue, verifyValue } from '@app/lib/cipher';
 import gravatar from 'gravatar';
-import { Scopes } from '@app/modules/oauth2/constants';
+import { ApiScopes, Scopes } from '@app/modules/oauth2/constants';
 import { Field, ObjectType } from '@nestjs/graphql';
 import { EmailAddressResolver } from 'graphql-scalars';
 import { Roles } from '@app/modules/auth/roles';
@@ -103,6 +103,24 @@ export class User extends BaseEntity {
         },
       },
       ...scopes.includes(Scopes.email) && {
+        email: this.email,
+        email_verified: !!this.emailVerifiedAt,
+      }
+    }
+  }
+
+  public toApiProfile(scopes: ApiScopes[]) {
+    return {
+      id: this.id,
+      ...scopes.includes(ApiScopes.users_profile) && {
+        picture: this.picture,
+        nickname: this.nickname,
+        updated_at: this.updatedAt,
+        ...this.firstName && {
+          name: `${this.firstName} ${this.lastName}`.trimRight(),
+        },
+      },
+      ...scopes.includes(ApiScopes.users_email) && {
         email: this.email,
         email_verified: !!this.emailVerifiedAt,
       }

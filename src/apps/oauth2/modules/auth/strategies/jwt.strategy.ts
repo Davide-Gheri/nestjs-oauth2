@@ -3,7 +3,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { JwtService } from '@app/lib/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '@app/entities';
+import { OAuthClient, User } from '@app/entities';
 import { Repository } from 'typeorm';
 import { plainToClass } from 'class-transformer';
 import { Request } from 'express';
@@ -14,6 +14,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     private readonly jwtService: JwtService,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(OAuthClient)
+    private readonly clientRepository: Repository<OAuthClient>,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -30,11 +32,36 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(req: Request, data: any) {
-    const user = await this.userRepository.findOne(data.sub);
+    const [id, target] = data.sub.split('@');
+
     req.accessToken = data;
+
+    switch (target) {
+      case 'users':
+        return this.validateUser(req, id);
+      case 'clients':
+        return this.validateClient(req, id);
+      default:
+        throw new UnauthorizedException('invalid token');
+    }
+  }
+
+  async validateUser(req: Request, id: string) {
+    const user = await this.userRepository.findOne(id);
+
     if (!user) {
       throw new UnauthorizedException();
     }
+
     return plainToClass(User, user);
+  }
+
+  async validateClient(req: Request, id: string) {
+    const client = await this.clientRepository.findOne(id);
+    if (!client) {
+      throw new UnauthorizedException();
+    }
+
+    return true;
   }
 }
