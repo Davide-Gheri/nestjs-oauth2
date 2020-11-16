@@ -1,0 +1,2 @@
+
+export const GRANT_TYPE_METADATA = '__GRANT_TYPE_METADATA__';

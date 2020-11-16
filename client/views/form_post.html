@@ -1,0 +1,10 @@
+<html>
+<head><title>Submit</title></head>
+<body onload="javascript:document.forms[0].submit()">
+<form method="post" action="{{ returnTo }}">
+    {{#each hiddenFields}}
+        <input type="hidden" name="{{@key}}" value="{{this}}">
+    {{/each}}
+</form>
+</body>
+</html>
