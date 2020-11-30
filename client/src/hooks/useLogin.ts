@@ -1,5 +1,5 @@
 import { useForm } from 'react-hook-form';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useMutation, Action } from 'react-fetching-library';
 import { useLocation } from 'react-router';
 
@@ -13,7 +13,7 @@ const loginAction = (query?: Record<string, any>) => (body: LoginData): Action =
   method: 'POST',
   endpoint: `/auth/login?redirect_uri=${encodeURIComponent(query?.redirect_uri || '/')}`,
   body,
-})
+});
 
 export const useLogin = () => {
   const { query } = useLocation();
@@ -23,15 +23,20 @@ export const useLogin = () => {
       remember: false,
     },
   });
+  const [requiresTfa, setRequiresTfa] = useState<boolean>(false);
 
   const onSubmit = useCallback((data: LoginData) => {
     mutate(data)
       .then(value => {
         if (!value.error) {
-          window.location.href = value.payload.returnTo || '/';
+          if (value.status === 206 && value.payload.tfaRequired) {
+            setRequiresTfa(true);
+          } else {
+            window.location.href = value.payload.returnTo || '/';
+          }
         }
       })
-  }, [mutate]);
+  }, [mutate, setRequiresTfa]);
 
   useEffect(() => {
     if (error) {
@@ -51,5 +56,6 @@ export const useLogin = () => {
     onSubmit: handleSubmit(onSubmit),
     ...form,
     loading,
+    requiresTfa,
   }
 }

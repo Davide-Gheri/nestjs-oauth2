@@ -1,2 +1,3 @@
+import { useAppData } from './useAppdata';
 
-export const useCsrf = () => window.__APP_DATA__?.csrfToken;
+export const useCsrf = () => useAppData()?.csrfToken;

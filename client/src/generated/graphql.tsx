@@ -52,7 +52,7 @@ export enum ResponseTypes {
 export enum ResponseModes {
   Query = 'query',
   Fragment = 'fragment',
-  FormPort = 'form_port'
+  FormPost = 'form_post'
 }
 
 export enum TokenAuthMethod {
@@ -69,9 +69,10 @@ export type User = {
   nickname: Scalars['String'];
   firstName?: Maybe<Scalars['String']>;
   lastName?: Maybe<Scalars['String']>;
-  email: Scalars['EmailAddress'];
+  email?: Maybe<Scalars['EmailAddress']>;
   emailVerifiedAt?: Maybe<Scalars['DateTime']>;
   role: Roles;
+  tfaEnabled: Scalars['Boolean'];
   picture: Scalars['String'];
 };
 
@@ -80,6 +81,18 @@ export enum Roles {
   Admin = 'ADMIN',
   User = 'USER'
 }
+
+export type PaginationInfo = {
+  __typename?: 'PaginationInfo';
+  hasMore: Scalars['Boolean'];
+  total: Scalars['Int'];
+};
+
+export type UsersPaginatedResponse = {
+  __typename?: 'UsersPaginatedResponse';
+  items: Array<User>;
+  paginationInfo: PaginationInfo;
+};
 
 export type Session = {
   __typename?: 'Session';
@@ -94,11 +107,14 @@ export type Session = {
 export type Query = {
   __typename?: 'Query';
   activeSessions: Array<Session>;
+  clientsCount: Scalars['Int'];
   getClient: OAuthClient;
   getClients: Array<OAuthClient>;
   getCurrentUser?: Maybe<User>;
   getUser: User;
-  getUsers: Array<User>;
+  getUsers: UsersPaginatedResponse;
+  newSignUps: Scalars['Int'];
+  usersCount: Scalars['Int'];
 };
 
 
@@ -111,6 +127,17 @@ export type QueryGetUserArgs = {
   id: Scalars['ID'];
 };
 
+
+export type QueryGetUsersArgs = {
+  limit?: Maybe<Scalars['Int']>;
+  skip?: Maybe<Scalars['Int']>;
+};
+
+
+export type QueryNewSignUpsArgs = {
+  since: Scalars['DateTime'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   createClient: OAuthClient;
@@ -121,6 +148,9 @@ export type Mutation = {
   deleteUser: Scalars['Boolean'];
   deleteSession: Scalars['Boolean'];
   updateCurrentUser: User;
+  requestTfa: Scalars['String'];
+  verifyTfa: Scalars['Boolean'];
+  disableTfa: Scalars['Boolean'];
 };
 
 
@@ -163,6 +193,11 @@ export type MutationDeleteSessionArgs = {
 
 export type MutationUpdateCurrentUserArgs = {
   data: UpdateCurrentUserInput;
+};
+
+
+export type MutationVerifyTfaArgs = {
+  code: Scalars['String'];
 };
 
 export type CreateClientInput = {
@@ -224,7 +259,7 @@ export type ClientDataFragment = (
 
 export type UserDataFragment = (
   { __typename?: 'User' }
-  & Pick<User, 'id' | 'nickname' | 'firstName' | 'lastName' | 'email' | 'picture' | 'createdAt' | 'updatedAt' | 'emailVerifiedAt' | 'role'>
+  & Pick<User, 'id' | 'nickname' | 'firstName' | 'lastName' | 'email' | 'picture' | 'createdAt' | 'updatedAt' | 'emailVerifiedAt' | 'role' | 'tfaEnabled'>
 );
 
 export type SessionDataFragment = (
@@ -290,6 +325,32 @@ export type DeleteSessionMutationVariables = {
 export type DeleteSessionMutation = (
   { __typename?: 'Mutation' }
   & Pick<Mutation, 'deleteSession'>
+);
+
+export type RequestTfaMutationVariables = {};
+
+
+export type RequestTfaMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'requestTfa'>
+);
+
+export type VerifyTfaMutationVariables = {
+  code: Scalars['String'];
+};
+
+
+export type VerifyTfaMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'verifyTfa'>
+);
+
+export type DisableTfaMutationVariables = {};
+
+
+export type DisableTfaMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'disableTfa'>
 );
 
 export type CreateUserMutationVariables = {
@@ -375,15 +436,41 @@ export type GetActiveSessionsQuery = (
   )> }
 );
 
-export type GetUsersQueryVariables = {};
+export type GetDashboardInfoQueryVariables = {
+  since: Scalars['DateTime'];
+};
+
+
+export type GetDashboardInfoQuery = (
+  { __typename?: 'Query' }
+  & Pick<Query, 'clientsCount' | 'usersCount' | 'newSignUps'>
+  & { getUsers: (
+    { __typename?: 'UsersPaginatedResponse' }
+    & { items: Array<(
+      { __typename?: 'User' }
+      & UserDataFragment
+    )> }
+  ) }
+);
+
+export type GetUsersQueryVariables = {
+  skip: Scalars['Int'];
+  limit: Scalars['Int'];
+};
 
 
 export type GetUsersQuery = (
   { __typename?: 'Query' }
-  & { getUsers: Array<(
-    { __typename?: 'User' }
-    & UserDataFragment
-  )> }
+  & { getUsers: (
+    { __typename?: 'UsersPaginatedResponse' }
+    & { items: Array<(
+      { __typename?: 'User' }
+      & UserDataFragment
+    )>, paginationInfo: (
+      { __typename?: 'PaginationInfo' }
+      & Pick<PaginationInfo, 'total' | 'hasMore'>
+    ) }
+  ) }
 );
 
 export type GetUserQueryVariables = {
@@ -428,6 +515,7 @@ export const UserDataFragmentDoc = gql`
   updatedAt
   emailVerifiedAt
   role
+  tfaEnabled
 }
     `;
 export const SessionDataFragmentDoc = gql`
@@ -481,6 +569,27 @@ export const DeleteSessionDocument = gql`
     `;
 export type DeleteSessionMutationResult = ApolloReactCommon.MutationResult<DeleteSessionMutation>;
 export type DeleteSessionMutationOptions = ApolloReactCommon.BaseMutationOptions<DeleteSessionMutation, DeleteSessionMutationVariables>;
+export const RequestTfaDocument = gql`
+    mutation RequestTfa {
+  requestTfa
+}
+    `;
+export type RequestTfaMutationResult = ApolloReactCommon.MutationResult<RequestTfaMutation>;
+export type RequestTfaMutationOptions = ApolloReactCommon.BaseMutationOptions<RequestTfaMutation, RequestTfaMutationVariables>;
+export const VerifyTfaDocument = gql`
+    mutation VerifyTfa($code: String!) {
+  verifyTfa(code: $code)
+}
+    `;
+export type VerifyTfaMutationResult = ApolloReactCommon.MutationResult<VerifyTfaMutation>;
+export type VerifyTfaMutationOptions = ApolloReactCommon.BaseMutationOptions<VerifyTfaMutation, VerifyTfaMutationVariables>;
+export const DisableTfaDocument = gql`
+    mutation DisableTfa {
+  disableTfa
+}
+    `;
+export type DisableTfaMutationResult = ApolloReactCommon.MutationResult<DisableTfaMutation>;
+export type DisableTfaMutationOptions = ApolloReactCommon.BaseMutationOptions<DisableTfaMutation, DisableTfaMutationVariables>;
 export const CreateUserDocument = gql`
     mutation CreateUser($data: CreateUserInput!) {
   createUser(data: $data) {
@@ -538,10 +647,29 @@ export const GetActiveSessionsDocument = gql`
 }
     ${SessionDataFragmentDoc}`;
 export type GetActiveSessionsQueryResult = ApolloReactCommon.QueryResult<GetActiveSessionsQuery, GetActiveSessionsQueryVariables>;
+export const GetDashboardInfoDocument = gql`
+    query GetDashboardInfo($since: DateTime!) {
+  clientsCount
+  usersCount
+  newSignUps(since: $since)
+  getUsers(limit: 5) {
+    items {
+      ...UserData
+    }
+  }
+}
+    ${UserDataFragmentDoc}`;
+export type GetDashboardInfoQueryResult = ApolloReactCommon.QueryResult<GetDashboardInfoQuery, GetDashboardInfoQueryVariables>;
 export const GetUsersDocument = gql`
-    query GetUsers {
-  getUsers {
-    ...UserData
+    query GetUsers($skip: Int!, $limit: Int!) {
+  getUsers(skip: $skip, limit: $limit) {
+    items {
+      ...UserData
+    }
+    paginationInfo {
+      total
+      hasMore
+    }
   }
 }
     ${UserDataFragmentDoc}`;

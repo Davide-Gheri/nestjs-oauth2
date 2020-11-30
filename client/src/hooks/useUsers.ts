@@ -1,10 +1,13 @@
 import { useQuery } from '@apollo/client';
-import { GetUsersDocument, GetUsersQuery } from '../generated/graphql';
+import { GetUsersDocument, GetUsersQuery, GetUsersQueryVariables } from '../generated/graphql';
 import { useEffect, useState } from 'react';
 
-export const useUsers = () => {
-  const { data, loading, error } = useQuery<GetUsersQuery>(GetUsersDocument);
-
+export const useUsers = (limit: number = 10, skip: number = 0) => {
+  const { data, loading, error } = useQuery<GetUsersQuery, GetUsersQueryVariables>(GetUsersDocument, {
+    variables: {
+      limit, skip,
+    },
+  });
   const [errorCode, setErrorCode] = useState<string>('');
 
   useEffect(() => {
@@ -17,7 +20,8 @@ export const useUsers = () => {
   }, [error]);
 
   return {
-    users: (data?.getUsers || []),
+    users: (data?.getUsers.items || []),
+    total: data?.getUsers.paginationInfo.total || 0,
     loading,
     error,
     errorCode,

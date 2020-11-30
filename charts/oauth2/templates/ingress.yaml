@@ -1,0 +1,28 @@
+{{- if .Values.ingress.enabled -}}
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: {{ include "oauth2.fullname" . }}
+  annotations:
+    helm.sh/hook: "post-install,post-upgrade"
+    {{- with .Values.ingress.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  labels:
+    {{- include "oauth2.labels" . | nindent 4 }}
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: {{ .Values.ingress.match }}
+      kind: Rule
+      services:
+        - kind: Service
+          name: {{ include "oauth2.fullname" . }}
+          passHostHeader: true
+          port: 80
+          responseForwarding:
+            flushInterval: 1ms
+          strategy: RoundRobin
+          weight: 10
+  {{- end -}}

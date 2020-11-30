@@ -11,7 +11,9 @@
     "baseUrl": "./",
     "skipLibCheck": true,
     "paths": {
-      "@app/*": ["src/*"]
+      "@app/*": ["src/apps/oauth2/*"],
+      "@init/*": ["src/apps/init/*"],
+      "@config": ["src/config"]
     },
     "incremental": true,
     "esModuleInterop": true

@@ -30,6 +30,7 @@ gql`
         updatedAt
         emailVerifiedAt
         role
+        tfaEnabled
     }
 `;
 

@@ -4,9 +4,32 @@ import { Box, Button, Typography, Paper, DialogTitle, DialogContent, Dialog } fr
 import { Add } from '@material-ui/icons';
 import { UserNew, UsersList } from '../../components/users';
 import { userCan } from '../../utils';
+import { useUsers } from '../../hooks';
 
 const UsersPage: React.FC<RouteComponentProps> = () => {
   const [open, setOpen] = useState(false);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const { users, loading, errorCode, error, total } = useUsers(rowsPerPage, rowsPerPage * page);
+
+  const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  const pagination = {
+    total,
+    rowsPerPage,
+    page,
+    onPageChange: handleChangePage,
+    onRowsPerPageChange: handleChangeRowsPerPage,
+  }
 
   return (
     <div>
@@ -24,7 +47,13 @@ const UsersPage: React.FC<RouteComponentProps> = () => {
         )}
       </Box>
       <Paper>
-        <UsersList/>
+        <UsersList
+          users={users}
+          loading={loading}
+          error={error}
+          errorCode={errorCode}
+          pagination={pagination}
+        />
       </Paper>
       <Dialog open={open} onClose={() => setOpen(false)}>
         <DialogTitle>

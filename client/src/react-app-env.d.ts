@@ -13,6 +13,7 @@ declare global {
     __APP_DATA__: {
       user?: any;
       currentSession?: string;
+      appName?: string;
       grants: {
         [key: string]: {
           [key: string]: {

@@ -42,7 +42,7 @@ enum ResponseTypes {
 enum ResponseModes {
   query
   fragment
-  form_port
+  form_post
 }
 
 enum TokenAuthMethod {
@@ -58,9 +58,10 @@ type User {
   nickname: String!
   firstName: String
   lastName: String
-  email: EmailAddress!
+  email: EmailAddress
   emailVerifiedAt: DateTime
   role: Roles!
+  tfaEnabled: Boolean!
   picture: String!
 }
 
@@ -72,6 +73,16 @@ scalar EmailAddress
 enum Roles {
   ADMIN
   USER
+}
+
+type PaginationInfo {
+  hasMore: Boolean!
+  total: Int!
+}
+
+type UsersPaginatedResponse {
+  items: [User!]!
+  paginationInfo: PaginationInfo!
 }
 
 type Session {
@@ -86,9 +97,12 @@ type Session {
 type Query {
   getClients: [OAuthClient!]!
   getClient(id: ID!): OAuthClient!
-  getUsers: [User!]!
+  getUsers(limit: Int = 10, skip: Int = 0): UsersPaginatedResponse!
   getUser(id: ID!): User!
   activeSessions: [Session!]!
+  usersCount: Int!
+  clientsCount: Int!
+  newSignUps(since: DateTime!): Int!
 }
 
 type Mutation {
@@ -100,6 +114,9 @@ type Mutation {
   deleteUser(id: ID!): Boolean!
   deleteSession(id: ID!): Boolean!
   updateCurrentUser(data: UpdateCurrentUserInput!): User!
+  requestTfa: String!
+  verifyTfa(code: String!): Boolean!
+  disableTfa: Boolean!
 }
 
 input CreateClientInput {

@@ -1,0 +1,88 @@
+# Default values for oauth2.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: eu.gcr.io/graphical-petal-284708/argo/oauth2
+  tag: latest
+  pullPolicy: IfNotPresent
+
+imagePullSecrets:
+  - name: gcr-json-key
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name:
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  annotations: {}
+  match: Host(`oauth2.argo.services`)
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+appUrl: ""
+
+database:
+  host: "rogue.db.elephantsql.com"
+  port: "5432"
+  name: "lelqzoje"
+  username: "lelqzoje"
+  password: "PIRRPwFQNPV7Zo4FZ5KIhZB8gdDnVksF"
+
+redis:
+  host: "redis-master.default.svc.cluster.local"
+  port: "6379"
+
+facebook:
+  id: "fbid"
+  secret: "fbsecret"
+google:
+  id: "gooid"
+  secret: "goosecret"
+
+crypto:
+  iv: "iv1234"
+  secret: "secret1234"
+
+secrets: {}

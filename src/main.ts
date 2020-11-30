@@ -1,68 +1,33 @@
-import session from 'express-session';
-import sessionStore from 'connect-redis';
-import cookieParser from 'cookie-parser';
-import bodyParser from 'body-parser';
-import rateLimit from 'express-rate-limit';
-import helmet from 'helmet';
-import passport from 'passport';
-import hbs from 'hbs';
-import { join, resolve } from 'path';
+// tslint:disable-next-line:no-var-requires
+require('dotenv').config();
 
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { NestExpressApplication } from '@nestjs/platform-express';
-import { ConfigService } from '@nestjs/config';
-import { ValidationPipe } from '@nestjs/common';
-import { getConnectionToken } from '@app/lib/redis';
+import { Command } from 'commander';
+import bootstrapApp from './apps/oauth2/main';
+import bootstrapCli from './apps/cli/main';
+import bootstrapInit from './apps/init/main';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    cors: true,
-    bodyParser: false,
-  });
-  const config = app.get(ConfigService);
+  const program = new Command(process.env.NODE_UID);
+  program.version(require('../package.json').version);
 
-  app.useGlobalPipes(new ValidationPipe({ transform: true }));
+  program
+  .command('cli')
+  .description('CLI')
+  .name('cli')
+  .action(bootstrapCli);
 
-  const secret = config.get('crypto.secret');
-  const redis = app.get(getConnectionToken());
-  const SessionStore = sessionStore(session);
-  app.use(session({
-    store: new SessionStore({ client: redis }),
-    secret,
-    resave: true,
-    saveUninitialized: false,
-  }));
+  program
+  .command('serve', { isDefault: true })
+  .description('Start OAuth2 server')
+  .name('serve')
+  .action(bootstrapApp);
 
-  hbs.registerHelper('json', (ctx: any) => {
-    delete ctx.settings;
-    delete ctx.cache;
-    delete ctx._locals;
-    return JSON.stringify(ctx);
-  });
-  app.set('view engine', 'html');
-  app.engine('html', hbs.__express);
+  program
+  .command('init')
+  .description('Run the init script (migrate and seed the DB)')
+  .name('init')
+  .action(bootstrapInit);
 
-  const clientDir = resolve(__dirname, '..', 'client');
-
-  app.setBaseViewsDir(join(clientDir, 'views'));
-  app.useStaticAssets(join(clientDir, 'build'), {
-    // prefix: '/app',
-  });
-
-  app.use(bodyParser.json());
-  app.use(bodyParser.urlencoded({ extended: true }));
-  app.use(cookieParser(secret));
-
-  if (process.env.NODE_ENV === 'production') {
-    app.use(rateLimit(config.get<any>('rateLimit')));
-  }
-
-  app.use(helmet());
-  app.use(passport.initialize());
-  app.use(passport.session());
-  app.enableShutdownHooks();
-
-  await app.listen(config.get('app.port'));
+  await program.parseAsync(process.argv);
 }
 bootstrap();

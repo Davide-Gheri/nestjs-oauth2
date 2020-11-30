@@ -1,13 +1,7 @@
-import { dummyUser } from '../utils/dummy';
+import { useAppData } from './useAppdata';
 
 export const useCurrentUser = () => {
-  let user: any;
-
-  if (process.env.NODE_ENV === 'development') {
-    user = dummyUser;
-  } else {
-    user = window.__APP_DATA__.user;
-  }
+  const { user } = useAppData();
 
   return user;
 }

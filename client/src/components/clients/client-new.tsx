@@ -12,9 +12,13 @@ export const ClientNew: React.FC<{ onSubmit?: () => void }> = ({ onSubmit: onPar
   }, [register]);
 
   const onFormSubmit = useCallback(async (e: React.FormEvent) => {
-    await onSubmit(e);
-    if (onParentSubmit) {
-      onParentSubmit();
+    try {
+      await onSubmit(e);
+      if (onParentSubmit) {
+        onParentSubmit();
+      }
+    } catch (e) {
+      //
     }
   }, [onSubmit, onParentSubmit]);
 

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { RouteComponentProps } from 'react-router';
-import { Box, Paper, Typography, Button, Dialog, DialogTitle, DialogContent } from '@material-ui/core';
+import { Box, Paper, Typography, Button } from '@material-ui/core';
 import { Add } from '@material-ui/icons';
-import { ClientNew, ClientsList } from '../../components/clients';
+import { ClientNewDialog, ClientsList } from '../../components/clients';
 import { userCan } from '../../utils';
 
 const ClientsPage: React.FC<RouteComponentProps> = () => {
@@ -26,14 +26,7 @@ const ClientsPage: React.FC<RouteComponentProps> = () => {
       <Paper>
         <ClientsList/>
       </Paper>
-      <Dialog open={open} onClose={() => setOpen(false)}>
-        <DialogTitle>
-          Create a new Client
-        </DialogTitle>
-        <DialogContent>
-          <ClientNew onSubmit={() => setOpen(false)}/>
-        </DialogContent>
-      </Dialog>
+      <ClientNewDialog onClose={() => setOpen(false)} open={open}/>
     </div>
   )
 }
