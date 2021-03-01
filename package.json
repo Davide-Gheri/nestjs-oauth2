@@ -35,7 +35,7 @@
     "argon2": "^0.26.2",
     "base64-url": "^2.3.3",
     "bull": "^3.14.0",
-    "class-transformer": "^0.2.3",
+    "class-transformer": "^0.3.1",
     "class-validator": "^0.12.2",
     "commander": "^6.0.0",
     "connect-redis": "^4.0.4",
