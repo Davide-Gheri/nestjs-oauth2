@@ -55,7 +55,7 @@
     "hbs": "^4.1.1",
     "helmet": "^3.22.0",
     "ioredis": "^4.17.3",
-    "jose": "^1.27.0",
+    "jose": "^1.28.1",
     "mime-types": "^2.1.27",
     "nest-access-control": "^2.0.1",
     "nestjs-console": "^3.0.5",
