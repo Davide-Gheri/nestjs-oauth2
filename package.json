@@ -50,7 +50,7 @@
     "graphql": "^15.0.0",
     "graphql-scalars": "^1.1.5",
     "gravatar": "^1.8.0",
-    "handlebars": "^4.7.6",
+    "handlebars": "^4.7.7",
     "handlebars-layouts": "^3.1.4",
     "hbs": "^4.1.1",
     "helmet": "^3.22.0",
