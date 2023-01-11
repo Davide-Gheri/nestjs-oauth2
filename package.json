@@ -36,7 +36,7 @@
     "base64-url": "^2.3.3",
     "bull": "^3.14.0",
     "class-transformer": "^0.2.3",
-    "class-validator": "^0.12.2",
+    "class-validator": "^0.14.0",
     "commander": "^6.0.0",
     "connect-redis": "^4.0.4",
     "cookie-parser": "^1.4.5",
